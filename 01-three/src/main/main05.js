@@ -3,7 +3,7 @@ import * as THREE from 'THREE';
 // 导入轨道控制器
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-// 目标，掌握 gsap 实现动画
+// 目标，Clock来跟踪时间
 
 // 创建场景
 const scene = new THREE.Scene()

@@ -3,7 +3,7 @@ import * as THREE from 'THREE';
 // 导入轨道控制器
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-// 目标，掌握 gsap 实现动画
+// 目标，设置物体缩放
 
 // 创建场景
 const scene = new THREE.Scene()
@@ -54,21 +54,19 @@ const controls = new OrbitControls(camera, renderer.domElement)
 const axesHelper = new THREE.AxesHelper(5)
 scene.add(axesHelper)
 
-// 设置时钟
-const clock = new THREE.Clock()
-
-
 // 设置渲染函数
-function render () {
-  // 获取时钟运行的总时长
-  let time = clock.getElapsedTime()
-  // let deltaTime = clock.getDelta()
-
-  // console.log('时钟运行的总时长', time)
-  // console.log('两次获取时间的间隔时间', deltaTime)
-  let space = time % 5
-  cube.position.x = space
+function render (time) {
   // 使用渲染器通过相机将场景渲染出来
+  // renderer.render(scene, camera)
+  // cube.position.x += 0.01
+  // if (cube.position.x > 5) {
+  //   cube.position.x = 0
+  // }
+  // cube.rotation.x += 0.01
+
+  let t = (time / 1000) % 5
+  cube.position.x = t * 1
+
   renderer.render(scene, camera)
 
   // 下一帧继续render
