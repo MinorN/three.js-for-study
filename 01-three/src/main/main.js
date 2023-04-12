@@ -1,5 +1,5 @@
 // 目标:
-// 自定义一个炫酷的三角形物体
+// 纹理常用属性
 
 
 import * as THREE from 'THREE';
@@ -17,22 +17,40 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 camera.position.set(0, 0, 10)
 scene.add(camera)
 
+// 导入纹理
+const textureLoader = new THREE.TextureLoader()
+const doorColorTexture = textureLoader.load('./textures/door/color.jpg')
+
+// console.log(doorColorTexture)
+// 设置纹理偏移
+// doorColorTexture.offset.x = 0.5
+// doorColorTexture.offset.y = 0.5
+// doorColorTexture.offset.set(0.5, 0.5)
+
+// // 设置旋转原点
+// doorColorTexture.center.set(0.5, 0.5)
+
+// // 设置纹理的旋转
+// doorColorTexture.rotation = Math.PI / 4 //  旋转45°
+
+
+// 设置纹理是否重复
+doorColorTexture.repeat.set(2, 3) // 表示水平重复两次，垂直重复三次
+// 设置纹理重复模式
+doorColorTexture.wrapS = THREE.MirroredRepeatWrapping
+doorColorTexture.wrapT = THREE.RepeatWrapping
+
+
 // 添加物体
+const cubeGeometry = new THREE.BoxBufferGeometry(1, 1, 1)
+const basicMaterial = new THREE.MeshBasicMaterial({
+  color: "#ffff00",
+  map: doorColorTexture
+})
 
-for (let i = 0; i < 50; i++) {
-  const geometry = new THREE.BufferGeometry()
-  const positionArray = new Float32Array(9)
-  // 每个三角形需要3个顶点，每个顶点需要三个值
-  for (let j = 0; j < 9; j++) {
-    positionArray[j] = Math.random() * 10 - 5
-  }
-  let color = new THREE.Color(Math.random(), Math.random(), Math.random())
+const cube = new THREE.Mesh(cubeGeometry, basicMaterial)
 
-  geometry.setAttribute('position', new THREE.BufferAttribute(positionArray, 3))
-  const material = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.5 })
-  const mesh = new THREE.Mesh(geometry, material)
-  scene.add(mesh)
-}
+scene.add(cube)
 
 
 
