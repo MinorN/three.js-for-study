@@ -1,5 +1,5 @@
 // 目标:
-// AO环境遮挡贴图
+// 纹理常用属性
 
 
 import * as THREE from 'THREE';
@@ -21,39 +21,37 @@ scene.add(camera)
 const textureLoader = new THREE.TextureLoader()
 const doorColorTexture = textureLoader.load('./textures/door/color.jpg')
 
-const doorAlphaTexture = textureLoader.load('./textures/door/alpha.jpg')
+// console.log(doorColorTexture)
+// 设置纹理偏移
+// doorColorTexture.offset.x = 0.5
+// doorColorTexture.offset.y = 0.5
+// doorColorTexture.offset.set(0.5, 0.5)
 
-const doorAOTexture = textureLoader.load('./textures/door/ambientOcclusion.jpg')
+// // 设置旋转原点
+// doorColorTexture.center.set(0.5, 0.5)
+
+// // 设置纹理的旋转
+// doorColorTexture.rotation = Math.PI / 4 //  旋转45°
+
+
+// 设置纹理是否重复
+doorColorTexture.repeat.set(2, 3) // 表示水平重复两次，垂直重复三次
+// 设置纹理重复模式
+doorColorTexture.wrapS = THREE.MirroredRepeatWrapping
+doorColorTexture.wrapT = THREE.RepeatWrapping
 
 
 // 添加物体
 const cubeGeometry = new THREE.BoxBufferGeometry(1, 1, 1)
 const basicMaterial = new THREE.MeshBasicMaterial({
   color: "#ffff00",
-  map: doorColorTexture,
-  alphaMap: doorAlphaTexture,
-  transparent: true,
-  aoMap: doorAOTexture,
-  aoMapIntensity: 0.8
-  // side: THREE.FrontSide
+  map: doorColorTexture
 })
 
 const cube = new THREE.Mesh(cubeGeometry, basicMaterial)
-// 给cube设置第二组uv
-cubeGeometry.setAttribute('uv2', new THREE.BufferAttribute(cubeGeometry.attributes.uv.array, 2))
 
 scene.add(cube)
 
-
-// 添加一个平面
-const planeGeometry = new THREE.PlaneGeometry(1, 1)
-const plane = new THREE.Mesh(planeGeometry, basicMaterial)
-plane.position.set(3, 0, 0)
-
-scene.add(plane)
-
-// 给平面设置第二组uv
-planeGeometry.setAttribute('uv2', new THREE.BufferAttribute(planeGeometry.attributes.uv.array, 2))
 
 
 

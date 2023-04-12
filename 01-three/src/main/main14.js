@@ -1,5 +1,5 @@
 // 目标:
-// AO环境遮挡贴图
+// 透明材质和透明纹理
 
 
 import * as THREE from 'THREE';
@@ -23,37 +23,28 @@ const doorColorTexture = textureLoader.load('./textures/door/color.jpg')
 
 const doorAlphaTexture = textureLoader.load('./textures/door/alpha.jpg')
 
-const doorAOTexture = textureLoader.load('./textures/door/ambientOcclusion.jpg')
-
-
 // 添加物体
 const cubeGeometry = new THREE.BoxBufferGeometry(1, 1, 1)
 const basicMaterial = new THREE.MeshBasicMaterial({
   color: "#ffff00",
   map: doorColorTexture,
-  alphaMap: doorAlphaTexture,
+  // alphaMap: doorAlphaTexture,
   transparent: true,
-  aoMap: doorAOTexture,
-  aoMapIntensity: 0.8
-  // side: THREE.FrontSide
+  side: THREE.FrontSide
 })
 
 const cube = new THREE.Mesh(cubeGeometry, basicMaterial)
-// 给cube设置第二组uv
-cubeGeometry.setAttribute('uv2', new THREE.BufferAttribute(cubeGeometry.attributes.uv.array, 2))
 
 scene.add(cube)
 
 
 // 添加一个平面
-const planeGeometry = new THREE.PlaneGeometry(1, 1)
-const plane = new THREE.Mesh(planeGeometry, basicMaterial)
+const plane = new THREE.Mesh(
+  new THREE.PlaneGeometry(1, 1), basicMaterial
+)
 plane.position.set(3, 0, 0)
 
 scene.add(plane)
-
-// 给平面设置第二组uv
-planeGeometry.setAttribute('uv2', new THREE.BufferAttribute(planeGeometry.attributes.uv.array, 2))
 
 
 

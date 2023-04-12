@@ -74120,7 +74120,7 @@ var _OrbitControls = require("three/examples/jsm/controls/OrbitControls");
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 纹理常用属性
+// AO环境遮挡贴图
 
 // 导入轨道控制器
 
@@ -74135,33 +74135,34 @@ scene.add(camera);
 // 导入纹理
 var textureLoader = new THREE.TextureLoader();
 var doorColorTexture = textureLoader.load('./textures/door/color.jpg');
-
-// console.log(doorColorTexture)
-// 设置纹理偏移
-// doorColorTexture.offset.x = 0.5
-// doorColorTexture.offset.y = 0.5
-// doorColorTexture.offset.set(0.5, 0.5)
-
-// // 设置旋转原点
-// doorColorTexture.center.set(0.5, 0.5)
-
-// // 设置纹理的旋转
-// doorColorTexture.rotation = Math.PI / 4 //  旋转45°
-
-// 设置纹理是否重复
-doorColorTexture.repeat.set(2, 3); // 表示水平重复两次，垂直重复三次
-// 设置纹理重复模式
-doorColorTexture.wrapS = THREE.MirroredRepeatWrapping;
-doorColorTexture.wrapT = THREE.RepeatWrapping;
+var doorAlphaTexture = textureLoader.load('./textures/door/alpha.jpg');
+var doorAOTexture = textureLoader.load('./textures/door/ambientOcclusion.jpg');
 
 // 添加物体
 var cubeGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
 var basicMaterial = new THREE.MeshBasicMaterial({
   color: "#ffff00",
-  map: doorColorTexture
+  map: doorColorTexture,
+  alphaMap: doorAlphaTexture,
+  transparent: true,
+  aoMap: doorAOTexture,
+  aoMapIntensity: 0.8
+  // side: THREE.FrontSide
 });
+
 var cube = new THREE.Mesh(cubeGeometry, basicMaterial);
+// 给cube设置第二组uv
+cubeGeometry.setAttribute('uv2', new THREE.BufferAttribute(cubeGeometry.attributes.uv.array, 2));
 scene.add(cube);
+
+// 添加一个平面
+var planeGeometry = new THREE.PlaneGeometry(1, 1);
+var plane = new THREE.Mesh(planeGeometry, basicMaterial);
+plane.position.set(3, 0, 0);
+scene.add(plane);
+
+// 给平面设置第二组uv
+planeGeometry.setAttribute('uv2', new THREE.BufferAttribute(planeGeometry.attributes.uv.array, 2));
 
 // 初始化渲染器
 var renderer = new THREE.WebGLRenderer();
