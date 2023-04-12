@@ -1,5 +1,5 @@
 // 目标:
-// 掌握几何体顶点——UV——法向属性
+// 自定义一个炫酷的三角形物体
 
 
 import * as THREE from 'THREE';
@@ -18,25 +18,25 @@ camera.position.set(0, 0, 10)
 scene.add(camera)
 
 // 添加物体
-const geometry = new THREE.BufferGeometry()
 
-const vertices = new Float32Array([
-  -1.0, -1.0, 1.0,
-  1.0, -1.0, 1.0,
-  1.0, 1.0, 1.0,
-  1.0, 1.0, 1.0,
-  -1.0, 1.0, 1.0,
-  -1.0, -1.0, 1.0,
-])
+for (let i = 0; i < 50; i++) {
+  const geometry = new THREE.BufferGeometry()
+  const positionArray = new Float32Array(9)
+  // 每个三角形需要3个顶点，每个顶点需要三个值
+  for (let j = 0; j < 9; j++) {
+    positionArray[j] = Math.random() * 10 - 5
+  }
+  let color = new THREE.Color(Math.random(), Math.random(), Math.random())
 
-geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
+  geometry.setAttribute('position', new THREE.BufferAttribute(positionArray, 3))
+  const material = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.5 })
+  const mesh = new THREE.Mesh(geometry, material)
+  scene.add(mesh)
+}
 
-const material = new THREE.MeshBasicMaterial({ color: 0xffff00 })
-
-const mesh = new THREE.Mesh(geometry, material)
 
 
-scene.add(mesh)
+
 // 初始化渲染器
 const renderer = new THREE.WebGLRenderer()
 
