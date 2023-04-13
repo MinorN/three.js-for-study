@@ -1,5 +1,5 @@
 // 目标:
-// 设置粗糙度与粗糙度贴图
+// 设置金属度与金属贴图
 
 
 import * as THREE from 'THREE';
@@ -32,6 +32,9 @@ const doorHeightTexture = textureLoader.load('./textures/door/height.jpg')
 // 导入粗糙度贴图
 const doorRoughTexture = textureLoader.load('./textures/door/roughness.jpg')
 
+// 导入金属贴图
+const doorMaterTexture = textureLoader.load('./textures/door/metalness.jpg')
+
 // 添加物体
 const cubeGeometry = new THREE.BoxGeometry(1, 1, 1, 100, 100, 100)
 
@@ -46,7 +49,9 @@ const material = new THREE.MeshStandardMaterial({
   displacementMap: doorHeightTexture, /// 置换贴图，影响物体的高度，也就是有薄厚之分
   displacementScale: 0.05,
   roughnessMap: doorRoughTexture, // 粗糙贴图
-  roughness: 1 // 材质的粗糙度
+  roughness: 1, // 材质的粗糙度
+  metalnessMap: doorMaterTexture, // 金属贴图
+  metalness: 0.8,  // 金属的相似度
 })
 
 const cube = new THREE.Mesh(cubeGeometry, material)
