@@ -1,5 +1,5 @@
 // 目标:
-// 法线贴图应用
+// 设置金属度与金属贴图
 
 
 import * as THREE from 'THREE';
@@ -35,9 +35,6 @@ const doorRoughTexture = textureLoader.load('./textures/door/roughness.jpg')
 // 导入金属贴图
 const doorMaterTexture = textureLoader.load('./textures/door/metalness.jpg')
 
-// 导入法相贴图
-const doorNormalTexture = textureLoader.load('./textures/door/normal.jpg')
-
 // 添加物体
 const cubeGeometry = new THREE.BoxGeometry(1, 1, 1, 100, 100, 100)
 
@@ -55,7 +52,6 @@ const material = new THREE.MeshStandardMaterial({
   roughness: 1, // 材质的粗糙度
   metalnessMap: doorMaterTexture, // 金属贴图
   metalness: 0.8,  // 金属的相似度
-  normalMap: doorNormalTexture,
 })
 
 const cube = new THREE.Mesh(cubeGeometry, material)

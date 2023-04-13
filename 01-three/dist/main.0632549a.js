@@ -74120,7 +74120,7 @@ var _OrbitControls = require("three/examples/jsm/controls/OrbitControls");
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 设置金属度与金属贴图
+// 法线贴图应用
 
 // 导入轨道控制器
 
@@ -74147,6 +74147,9 @@ var doorRoughTexture = textureLoader.load('./textures/door/roughness.jpg');
 // 导入金属贴图
 var doorMaterTexture = textureLoader.load('./textures/door/metalness.jpg');
 
+// 导入法相贴图
+var doorNormalTexture = textureLoader.load('./textures/door/normal.jpg');
+
 // 添加物体
 var cubeGeometry = new THREE.BoxGeometry(1, 1, 1, 100, 100, 100);
 var material = new THREE.MeshStandardMaterial({
@@ -74166,9 +74169,10 @@ var material = new THREE.MeshStandardMaterial({
   // 材质的粗糙度
   metalnessMap: doorMaterTexture,
   // 金属贴图
-  metalness: 0.8 // 金属的相似度
+  metalness: 0.8,
+  // 金属的相似度
+  normalMap: doorNormalTexture
 });
-
 var cube = new THREE.Mesh(cubeGeometry, material);
 // 给cube设置第二组uv
 cubeGeometry.setAttribute('uv2', new THREE.BufferAttribute(cubeGeometry.attributes.uv.array, 2));
