@@ -1,5 +1,5 @@
 // 目标:
-// 置换贴图与定点细分设置
+// 标准网格材质与光照物理效果
 
 
 import * as THREE from 'THREE';
@@ -26,12 +26,8 @@ const doorAlphaTexture = textureLoader.load('./textures/door/alpha.jpg')
 const doorAOTexture = textureLoader.load('./textures/door/ambientOcclusion.jpg')
 
 
-// 导入置换贴图
-const doorHeightTexture = textureLoader.load('./textures/door/height.jpg')
-
-
 // 添加物体
-const cubeGeometry = new THREE.BoxGeometry(1, 1, 1, 100, 100, 100)
+const cubeGeometry = new THREE.BoxBufferGeometry(1, 1, 1)
 
 const material = new THREE.MeshStandardMaterial({
   color: "#ffff00",
@@ -39,10 +35,8 @@ const material = new THREE.MeshStandardMaterial({
   alphaMap: doorAlphaTexture,
   transparent: true,
   aoMap: doorAOTexture,
-  aoMapIntensity: 0.8,
+  aoMapIntensity: 0.8
   // side: THREE.FrontSide
-  displacementMap: doorHeightTexture, /// 置换贴图，影响物体的高度，也就是有薄厚之分
-  displacementScale: 0.05
 })
 
 const cube = new THREE.Mesh(cubeGeometry, material)
@@ -53,9 +47,9 @@ scene.add(cube)
 
 
 // 添加一个平面
-const planeGeometry = new THREE.PlaneGeometry(1, 1, 200, 200)
+const planeGeometry = new THREE.PlaneGeometry(1, 1)
 const plane = new THREE.Mesh(planeGeometry, material)
-plane.position.set(1.5, 0, 0)
+plane.position.set(3, 0, 0)
 
 scene.add(plane)
 

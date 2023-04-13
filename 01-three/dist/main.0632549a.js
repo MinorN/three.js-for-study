@@ -74120,7 +74120,7 @@ var _OrbitControls = require("three/examples/jsm/controls/OrbitControls");
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 标准网格材质与光照物理效果
+// 置换贴图与定点细分设置
 
 // 导入轨道控制器
 
@@ -74138,27 +74138,32 @@ var doorColorTexture = textureLoader.load('./textures/door/color.jpg');
 var doorAlphaTexture = textureLoader.load('./textures/door/alpha.jpg');
 var doorAOTexture = textureLoader.load('./textures/door/ambientOcclusion.jpg');
 
+// 导入置换贴图
+var doorHeightTexture = textureLoader.load('./textures/door/height.jpg');
+
 // 添加物体
-var cubeGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
+var cubeGeometry = new THREE.BoxGeometry(1, 1, 1, 100, 100, 100);
 var material = new THREE.MeshStandardMaterial({
   color: "#ffff00",
   map: doorColorTexture,
   alphaMap: doorAlphaTexture,
   transparent: true,
   aoMap: doorAOTexture,
-  aoMapIntensity: 0.8
+  aoMapIntensity: 0.8,
   // side: THREE.FrontSide
+  displacementMap: doorHeightTexture,
+  /// 置换贴图，影响物体的高度，也就是有薄厚之分
+  displacementScale: 0.05
 });
-
 var cube = new THREE.Mesh(cubeGeometry, material);
 // 给cube设置第二组uv
 cubeGeometry.setAttribute('uv2', new THREE.BufferAttribute(cubeGeometry.attributes.uv.array, 2));
 scene.add(cube);
 
 // 添加一个平面
-var planeGeometry = new THREE.PlaneGeometry(1, 1);
+var planeGeometry = new THREE.PlaneGeometry(1, 1, 200, 200);
 var plane = new THREE.Mesh(planeGeometry, material);
-plane.position.set(3, 0, 0);
+plane.position.set(1.5, 0, 0);
 scene.add(plane);
 
 // 给平面设置第二组uv
