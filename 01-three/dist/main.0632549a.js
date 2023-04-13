@@ -74120,7 +74120,7 @@ var _OrbitControls = require("three/examples/jsm/controls/OrbitControls");
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// AO环境遮挡贴图
+// 标准网格材质与光照物理效果
 
 // 导入轨道控制器
 
@@ -74140,7 +74140,7 @@ var doorAOTexture = textureLoader.load('./textures/door/ambientOcclusion.jpg');
 
 // 添加物体
 var cubeGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
-var basicMaterial = new THREE.MeshBasicMaterial({
+var material = new THREE.MeshStandardMaterial({
   color: "#ffff00",
   map: doorColorTexture,
   alphaMap: doorAlphaTexture,
@@ -74150,19 +74150,28 @@ var basicMaterial = new THREE.MeshBasicMaterial({
   // side: THREE.FrontSide
 });
 
-var cube = new THREE.Mesh(cubeGeometry, basicMaterial);
+var cube = new THREE.Mesh(cubeGeometry, material);
 // 给cube设置第二组uv
 cubeGeometry.setAttribute('uv2', new THREE.BufferAttribute(cubeGeometry.attributes.uv.array, 2));
 scene.add(cube);
 
 // 添加一个平面
 var planeGeometry = new THREE.PlaneGeometry(1, 1);
-var plane = new THREE.Mesh(planeGeometry, basicMaterial);
+var plane = new THREE.Mesh(planeGeometry, material);
 plane.position.set(3, 0, 0);
 scene.add(plane);
 
 // 给平面设置第二组uv
 planeGeometry.setAttribute('uv2', new THREE.BufferAttribute(planeGeometry.attributes.uv.array, 2));
+
+// 灯光
+// 1. 环境光
+var light = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(light);
+// 2. 直线光
+var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+directionalLight.position.set(10, 10, 10);
+scene.add(directionalLight);
 
 // 初始化渲染器
 var renderer = new THREE.WebGLRenderer();
@@ -74253,7 +74262,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51110" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56286" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

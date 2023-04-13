@@ -1,5 +1,5 @@
 // 目标:
-// AO环境遮挡贴图
+// 标准网格材质与光照物理效果
 
 
 import * as THREE from 'THREE';
@@ -28,7 +28,8 @@ const doorAOTexture = textureLoader.load('./textures/door/ambientOcclusion.jpg')
 
 // 添加物体
 const cubeGeometry = new THREE.BoxBufferGeometry(1, 1, 1)
-const basicMaterial = new THREE.MeshBasicMaterial({
+
+const material = new THREE.MeshStandardMaterial({
   color: "#ffff00",
   map: doorColorTexture,
   alphaMap: doorAlphaTexture,
@@ -38,7 +39,7 @@ const basicMaterial = new THREE.MeshBasicMaterial({
   // side: THREE.FrontSide
 })
 
-const cube = new THREE.Mesh(cubeGeometry, basicMaterial)
+const cube = new THREE.Mesh(cubeGeometry, material)
 // 给cube设置第二组uv
 cubeGeometry.setAttribute('uv2', new THREE.BufferAttribute(cubeGeometry.attributes.uv.array, 2))
 
@@ -47,13 +48,24 @@ scene.add(cube)
 
 // 添加一个平面
 const planeGeometry = new THREE.PlaneGeometry(1, 1)
-const plane = new THREE.Mesh(planeGeometry, basicMaterial)
+const plane = new THREE.Mesh(planeGeometry, material)
 plane.position.set(3, 0, 0)
 
 scene.add(plane)
 
 // 给平面设置第二组uv
 planeGeometry.setAttribute('uv2', new THREE.BufferAttribute(planeGeometry.attributes.uv.array, 2))
+
+
+
+// 灯光
+// 1. 环境光
+const light = new THREE.AmbientLight(0xffffff, 0.5)
+scene.add(light)
+// 2. 直线光
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
+directionalLight.position.set(10, 10, 10)
+scene.add(directionalLight)
 
 
 
