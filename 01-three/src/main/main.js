@@ -1,5 +1,5 @@
 // 目标:
-// 置换贴图与定点细分设置
+// 设置粗糙度与粗糙度贴图
 
 
 import * as THREE from 'THREE';
@@ -29,6 +29,8 @@ const doorAOTexture = textureLoader.load('./textures/door/ambientOcclusion.jpg')
 // 导入置换贴图
 const doorHeightTexture = textureLoader.load('./textures/door/height.jpg')
 
+// 导入粗糙度贴图
+const doorRoughTexture = textureLoader.load('./textures/door/roughness.jpg')
 
 // 添加物体
 const cubeGeometry = new THREE.BoxGeometry(1, 1, 1, 100, 100, 100)
@@ -42,7 +44,9 @@ const material = new THREE.MeshStandardMaterial({
   aoMapIntensity: 0.8,
   // side: THREE.FrontSide
   displacementMap: doorHeightTexture, /// 置换贴图，影响物体的高度，也就是有薄厚之分
-  displacementScale: 0.05
+  displacementScale: 0.05,
+  roughnessMap: doorRoughTexture, // 粗糙贴图
+  roughness: 1 // 材质的粗糙度
 })
 
 const cube = new THREE.Mesh(cubeGeometry, material)

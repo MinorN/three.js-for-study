@@ -74120,7 +74120,7 @@ var _OrbitControls = require("three/examples/jsm/controls/OrbitControls");
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 置换贴图与定点细分设置
+// 设置粗糙度与粗糙度贴图
 
 // 导入轨道控制器
 
@@ -74141,6 +74141,9 @@ var doorAOTexture = textureLoader.load('./textures/door/ambientOcclusion.jpg');
 // 导入置换贴图
 var doorHeightTexture = textureLoader.load('./textures/door/height.jpg');
 
+// 导入粗糙度贴图
+var doorRoughTexture = textureLoader.load('./textures/door/roughness.jpg');
+
 // 添加物体
 var cubeGeometry = new THREE.BoxGeometry(1, 1, 1, 100, 100, 100);
 var material = new THREE.MeshStandardMaterial({
@@ -74153,8 +74156,12 @@ var material = new THREE.MeshStandardMaterial({
   // side: THREE.FrontSide
   displacementMap: doorHeightTexture,
   /// 置换贴图，影响物体的高度，也就是有薄厚之分
-  displacementScale: 0.05
+  displacementScale: 0.05,
+  roughnessMap: doorRoughTexture,
+  // 粗糙贴图
+  roughness: 1 // 材质的粗糙度
 });
+
 var cube = new THREE.Mesh(cubeGeometry, material);
 // 给cube设置第二组uv
 cubeGeometry.setAttribute('uv2', new THREE.BufferAttribute(cubeGeometry.attributes.uv.array, 2));
