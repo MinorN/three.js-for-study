@@ -1,5 +1,6 @@
 // 目标:
-// 详解环境贴图
+// 纹理加载进度情况
+// 希望纹理加载完毕再进行显示，就需要了解纹理是否加载完成
 
 import * as THREE from 'THREE';
 
@@ -112,31 +113,6 @@ scene.add(plane)
 // 给平面设置第二组uv
 planeGeometry.setAttribute('uv2', new THREE.BufferAttribute(planeGeometry.attributes.uv.array, 2))
 
-
-
-// 设置cube纹理加载器
-const cubeTextureLoader = new THREE.CubeTextureLoader()
-const envMapTexture = cubeTextureLoader.load([
-  './textures/environmentMaps/1/px.jpg',
-  './textures/environmentMaps/1/nx.jpg',
-  './textures/environmentMaps/1/py.jpg',
-  './textures/environmentMaps/1/ny.jpg',
-  './textures/environmentMaps/1/pz.jpg',
-  './textures/environmentMaps/1/nz.jpg',
-])
-
-scene.background = envMapTexture
-
-
-
-const sphereGeometry = new THREE.SphereGeometry(1, 20, 20)
-const aphMaterial = new THREE.MeshStandardMaterial({
-  metalness: 0.7,
-  roughness: 0.1,
-  envMap: envMapTexture
-})
-const sphere = new THREE.Mesh(sphereGeometry, aphMaterial)
-scene.add(sphere)
 
 
 // 灯光

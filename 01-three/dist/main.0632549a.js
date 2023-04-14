@@ -74120,8 +74120,7 @@ var _OrbitControls = require("three/examples/jsm/controls/OrbitControls");
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 纹理加载进度情况
-// 希望纹理加载完毕再进行显示，就需要了解纹理是否加载完成
+// 详解环境贴图
 
 // 导入轨道控制器
 
@@ -74219,6 +74218,19 @@ scene.add(plane);
 
 // 给平面设置第二组uv
 planeGeometry.setAttribute('uv2', new THREE.BufferAttribute(planeGeometry.attributes.uv.array, 2));
+
+// 设置cube纹理加载器
+var cubeTextureLoader = new THREE.CubeTextureLoader();
+var envMapTexture = cubeTextureLoader.load(['./textures/environmentMaps/1/px.jpg', './textures/environmentMaps/1/nx.jpg', './textures/environmentMaps/1/py.jpg', './textures/environmentMaps/1/ny.jpg', './textures/environmentMaps/1/pz.jpg', './textures/environmentMaps/1/nz.jpg']);
+scene.background = envMapTexture;
+var sphereGeometry = new THREE.SphereGeometry(1, 20, 20);
+var aphMaterial = new THREE.MeshStandardMaterial({
+  metalness: 0.7,
+  roughness: 0.1,
+  envMap: envMapTexture
+});
+var sphere = new THREE.Mesh(sphereGeometry, aphMaterial);
+scene.add(sphere);
 
 // 灯光
 // 1. 环境光
