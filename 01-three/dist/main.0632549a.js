@@ -74120,7 +74120,8 @@ var _OrbitControls = require("three/examples/jsm/controls/OrbitControls");
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 法线贴图应用
+// 纹理加载进度情况
+// 希望纹理加载完毕再进行显示，就需要了解纹理是否加载完成
 
 // 导入轨道控制器
 
@@ -74132,8 +74133,40 @@ var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHei
 camera.position.set(0, 0, 10);
 scene.add(camera);
 
+// Q:那么多张呢？不会一张一张来吧？？？不可能的
+// LoadingManager
+// 设置加载管理器
+var div = document.createElement('div');
+div.style.width = '200px';
+div.style.height = '200px';
+div.style.position = 'fixed';
+div.style.right = 0;
+div.style.top = 0;
+div.style.color = '#fff';
+document.body.appendChild(div);
+var event = {};
+event.onLoad = function () {
+  console.log('图片加载完成');
+};
+event.onProgress = function (url, num, total) {
+  console.log('url ,num ,total', url, num, total);
+  console.log('图片加载中');
+  var value = (num / total * 100).toFixed(2) + '%';
+  div.innerHTML = value;
+  console.log('加载进度为', (num / total * 100).toFixed(2) + '%');
+};
+event.onError = function (error) {
+  console.log('error', error);
+  console.log('图片加载出错');
+};
+var LoadingManager = new THREE.LoadingManager(event.onLoad, event.onProgress, event.onError);
+
 // 导入纹理
-var textureLoader = new THREE.TextureLoader();
+var textureLoader = new THREE.TextureLoader(LoadingManager);
+
+// 单张纹理图的加载
+// const doorColorTexture = textureLoader.load('./textures/door/color.jpg',event.onLoad,event.onProgress,event.onError)
+
 var doorColorTexture = textureLoader.load('./textures/door/color.jpg');
 var doorAlphaTexture = textureLoader.load('./textures/door/alpha.jpg');
 var doorAOTexture = textureLoader.load('./textures/door/ambientOcclusion.jpg');
@@ -74285,7 +74318,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56286" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62625" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

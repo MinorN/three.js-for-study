@@ -1,6 +1,6 @@
 // 目标:
-// 纹理加载进度情况
-// 希望纹理加载完毕再进行显示，就需要了解纹理是否加载完成
+// 法线贴图应用
+
 
 import * as THREE from 'THREE';
 
@@ -17,51 +17,13 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 camera.position.set(0, 0, 10)
 scene.add(camera)
 
-
-// Q:那么多张呢？不会一张一张来吧？？？不可能的
-// LoadingManager
-// 设置加载管理器
-let div = document.createElement('div')
-div.style.width = '200px'
-div.style.height = '200px'
-div.style.position = 'fixed'
-div.style.right = 0
-div.style.top = 0
-div.style.color = '#fff'
-document.body.appendChild(div)
-let event = {}
-event.onLoad = function () {
-  console.log('图片加载完成')
-}
-event.onProgress = function (url, num, total) {
-  console.log('url ,num ,total', url, num, total)
-  console.log('图片加载中')
-  let value = ((num / total * 100).toFixed(2) + '%')
-  div.innerHTML = value
-  console.log('加载进度为', (num / total * 100).toFixed(2) + '%')
-
-}
-event.onError = function (error) {
-  console.log('error', error)
-  console.log('图片加载出错')
-}
-const LoadingManager = new THREE.LoadingManager(event.onLoad, event.onProgress, event.onError)
-
 // 导入纹理
-const textureLoader = new THREE.TextureLoader(LoadingManager)
-
-
-
-// 单张纹理图的加载
-// const doorColorTexture = textureLoader.load('./textures/door/color.jpg',event.onLoad,event.onProgress,event.onError)
-
+const textureLoader = new THREE.TextureLoader()
 const doorColorTexture = textureLoader.load('./textures/door/color.jpg')
-
 
 const doorAlphaTexture = textureLoader.load('./textures/door/alpha.jpg')
 
 const doorAOTexture = textureLoader.load('./textures/door/ambientOcclusion.jpg')
-
 
 
 // 导入置换贴图
