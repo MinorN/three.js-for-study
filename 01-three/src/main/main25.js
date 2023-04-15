@@ -1,15 +1,14 @@
 // 目标:
-// 平行光阴影属性和阴影相机原理
+// 灯光与阴影
 
 import * as THREE from 'THREE';
 
 // 导入轨道控制器
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-import * as dat from 'dat.gui';
 
 
-const gui = new dat.GUI()
+
 // 创建场景
 const scene = new THREE.Scene()
 
@@ -56,6 +55,8 @@ const renderer = new THREE.WebGLRenderer()
 // 设置渲染尺寸大小
 renderer.setSize(window.innerWidth, window.innerHeight)
 
+
+
 // 设置渲染器开启阴影计算
 renderer.shadowMap.enabled = true
 // 光照要投射阴影
@@ -64,33 +65,6 @@ directionalLight.castShadow = true
 sphere.castShadow = true
 // 平面要捕获阴影
 plane.receiveShadow = true
-
-
-
-
-// 设置阴影贴图模糊度
-directionalLight.shadow.radius = 20
-// 设置阴影贴图分辨率
-directionalLight.shadow.mapSize.set(2048, 2048)
-// 设置平行光投射相机的属性
-directionalLight.shadow.camera.near = 0.5
-directionalLight.shadow.camera.far = 500
-directionalLight.shadow.camera.top = 5
-directionalLight.shadow.camera.bottom = -5
-directionalLight.shadow.camera.left = -5
-directionalLight.shadow.camera.right = 5
-
-gui
-  .add(directionalLight.shadow.camera, 'near')
-  .min(0)
-  .max(20)
-  .step(0.1)
-  .onChange(() => {
-    directionalLight.shadow.camera.updateProjectionMatrix()
-  })
-
-
-
 
 
 
