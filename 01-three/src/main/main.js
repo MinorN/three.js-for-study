@@ -1,10 +1,26 @@
 // 目标:
-// 详解环境贴图
+// 经纬线映射贴图与HDR
 
 import * as THREE from 'THREE';
 
 // 导入轨道控制器
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
+
+
+
+
+// 加载HDR图
+const rgbLoader = new RGBELoader()
+rgbLoader.loadAsync('textures/hdr/002.hdr').then((textures) => {
+  textures.mapping = THREE.EquirectangularReflectionMapping
+  scene.background = textures
+  scene.environment = textures
+})
+
+
+
 
 
 // 创建场景
@@ -103,14 +119,14 @@ scene.add(cube)
 
 
 // 添加一个平面
-const planeGeometry = new THREE.PlaneGeometry(1, 1, 200, 200)
-const plane = new THREE.Mesh(planeGeometry, material)
-plane.position.set(1.5, 0, 0)
+// const planeGeometry = new THREE.PlaneGeometry(1, 1, 200, 200)
+// const plane = new THREE.Mesh(planeGeometry, material)
+// plane.position.set(1.5, 0, 0)
 
-scene.add(plane)
+// scene.add(plane)
 
 // 给平面设置第二组uv
-planeGeometry.setAttribute('uv2', new THREE.BufferAttribute(planeGeometry.attributes.uv.array, 2))
+// planeGeometry.setAttribute('uv2', new THREE.BufferAttribute(planeGeometry.attributes.uv.array, 2))
 
 
 
@@ -125,7 +141,8 @@ const envMapTexture = cubeTextureLoader.load([
   './textures/environmentMaps/1/nz.jpg',
 ])
 
-scene.background = envMapTexture
+scene.background = envMapTexture  // 给场景添加背景
+scene.environment = envMapTexture // 给场景所有的问题添加默认的环境贴图
 
 
 
@@ -133,7 +150,7 @@ const sphereGeometry = new THREE.SphereGeometry(1, 20, 20)
 const aphMaterial = new THREE.MeshStandardMaterial({
   metalness: 0.7,
   roughness: 0.1,
-  envMap: envMapTexture
+  // envMap: envMapTexture
 })
 const sphere = new THREE.Mesh(sphereGeometry, aphMaterial)
 scene.add(sphere)
