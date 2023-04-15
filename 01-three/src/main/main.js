@@ -1,5 +1,5 @@
 // 目标:
-// 经纬线映射贴图与HDR
+// 及时清除物体、几何体、材质、纹理，保证内存不泄露
 
 import * as THREE from 'THREE';
 
@@ -207,14 +207,52 @@ window.addEventListener('dblclick', () => {
   // }
 })
 
+
+
+// 创建绘制纹理贴图
+function createImage () {
+  const canvas = document.createElement('canvas')
+  canvas.width = 256
+  canvas.height = 256
+  const ctx = canvas.getContext("2d")
+  ctx.fillStyle = "red"
+  ctx.fillRect(0, 0, 256, 256)
+  return canvas
+}
+
 // 设置渲染函数
 function render () {
+
+
+  // 创建物体
+  const globalGeometry = new THREE.SphereGeometry(2, Math.random() * 64, Math.random() * 64)
+  // 创建canvas 纹理
+  const textures = new THREE.CanvasTexture(createImage())
+  const globalMaterial = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff, map: textures })
+  const global = new THREE.Mesh(globalGeometry, globalMaterial)
+  scene.add(global)
+
+
+
   controls.update()
   // 使用渲染器通过相机将场景渲染出来
   renderer.render(scene, camera)
 
+
   // 下一帧继续render
   requestAnimationFrame(render)
+
+  // 清除场景中物体
+  scene.remove(global)
+
+  // 清除几何体
+  globalGeometry.dispose()
+  // 清除材质
+  globalMaterial.dispose()
+  // 清除纹理
+  textures.dispose()
+
+
 }
 render()
 

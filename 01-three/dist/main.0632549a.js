@@ -74472,6 +74472,7 @@ var RGBELoader = /*#__PURE__*/function (_DataTextureLoader) {
 }(_three.DataTextureLoader);
 exports.RGBELoader = RGBELoader;
 },{"three":"../node_modules/three/build/three.module.js"}],"main/main.js":[function(require,module,exports) {
+var global = arguments[3];
 "use strict";
 
 var THREE = _interopRequireWildcard(require("THREE"));
@@ -74480,7 +74481,7 @@ var _RGBELoader = require("three/examples/jsm/loaders/RGBELoader");
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 经纬线映射贴图与HDR
+// 及时清除物体、几何体、材质、纹理，保证内存不泄露
 
 // 导入轨道控制器
 
@@ -74650,14 +74651,45 @@ window.addEventListener('dblclick', function () {
   // }
 });
 
+// 创建绘制纹理贴图
+function createImage() {
+  var canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  var ctx = canvas.getContext("2d");
+  ctx.fillStyle = "red";
+  ctx.fillRect(0, 0, 256, 256);
+  return canvas;
+}
+
 // 设置渲染函数
 function render() {
+  // 创建物体
+  var globalGeometry = new THREE.SphereGeometry(2, Math.random() * 64, Math.random() * 64);
+  // 创建canvas 纹理
+  var textures = new THREE.CanvasTexture(createImage());
+  var globalMaterial = new THREE.MeshBasicMaterial({
+    color: Math.random() * 0xffffff,
+    map: textures
+  });
+  var global = new THREE.Mesh(globalGeometry, globalMaterial);
+  scene.add(global);
   controls.update();
   // 使用渲染器通过相机将场景渲染出来
   renderer.render(scene, camera);
 
   // 下一帧继续render
   requestAnimationFrame(render);
+
+  // 清除场景中物体
+  scene.remove(global);
+
+  // 清除几何体
+  globalGeometry.dispose();
+  // 清除材质
+  globalMaterial.dispose();
+  // 清除纹理
+  textures.dispose();
 }
 render();
 
@@ -74702,7 +74734,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64134" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50739" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
