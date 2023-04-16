@@ -1,5 +1,5 @@
 // 目标:
-// 初识Points与点材质
+// 解析点材质属性
 
 import * as THREE from 'THREE';
 
@@ -21,7 +21,7 @@ scene.add(camera)
 
 
 // 创建球几何体
-const sphereGeometry = new THREE.SphereGeometry(3, 20, 20)
+const sphereGeometry = new THREE.SphereGeometry(3, 30, 30)
 // const material = new THREE.MeshBasicMaterial({
 //   color: 0xff0000,
 //   wireframe: true
@@ -29,11 +29,20 @@ const sphereGeometry = new THREE.SphereGeometry(3, 20, 20)
 // const mesh = new THREE.Mesh(sphereGeometry, material)
 // scene.add(mesh)
 
-
 // 创建点
 const pointMaterial = new THREE.PointsMaterial({
-  size: 0.1
+  size: 0.1,
+  color: 0xffff00,
+  sizeAttenuation: true, // 是否因为相机深度而衰减
 })
+// 载入纹理
+const textureLoader = new THREE.TextureLoader()
+const texture = textureLoader.load("./textures/particles/1.png")
+pointMaterial.map = texture
+pointMaterial.alphaMap = texture
+pointMaterial.transparent = true
+pointMaterial.depthWrite = false
+pointMaterial.blending = THREE.AdditiveBlending
 const points = new THREE.Points(sphereGeometry, pointMaterial)
 scene.add(points)
 

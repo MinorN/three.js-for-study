@@ -76602,7 +76602,7 @@ var dat = _interopRequireWildcard(require("dat.gui"));
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 初识Points与点材质
+// 解析点材质属性
 
 // 导入轨道控制器
 
@@ -76616,7 +76616,7 @@ camera.position.set(0, 0, 10);
 scene.add(camera);
 
 // 创建球几何体
-var sphereGeometry = new THREE.SphereGeometry(3, 20, 20);
+var sphereGeometry = new THREE.SphereGeometry(3, 30, 30);
 // const material = new THREE.MeshBasicMaterial({
 //   color: 0xff0000,
 //   wireframe: true
@@ -76626,8 +76626,18 @@ var sphereGeometry = new THREE.SphereGeometry(3, 20, 20);
 
 // 创建点
 var pointMaterial = new THREE.PointsMaterial({
-  size: 0.1
+  size: 0.1,
+  color: 0xffff00,
+  sizeAttenuation: true // 是否因为相机深度而衰减
 });
+// 载入纹理
+var textureLoader = new THREE.TextureLoader();
+var texture = textureLoader.load("./textures/particles/1.png");
+pointMaterial.map = texture;
+pointMaterial.alphaMap = texture;
+pointMaterial.transparent = true;
+pointMaterial.depthWrite = false;
+pointMaterial.blending = THREE.AdditiveBlending;
 var points = new THREE.Points(sphereGeometry, pointMaterial);
 scene.add(points);
 
