@@ -76602,7 +76602,7 @@ var dat = _interopRequireWildcard(require("dat.gui"));
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 平行光阴影属性和阴影相机原理
+// 详解聚光灯各种属性和应用
 
 // 导入轨道控制器
 
@@ -76622,7 +76622,7 @@ var sphere = new THREE.Mesh(sphereGeometry, material);
 scene.add(sphere);
 
 // 创建一个平面
-var planeGeometry = new THREE.PlaneGeometry(10, 10);
+var planeGeometry = new THREE.PlaneGeometry(50, 50);
 var plane = new THREE.Mesh(planeGeometry, material);
 plane.position.set(0, -1, 0);
 plane.rotation.x = -Math.PI / 2;
@@ -76632,10 +76632,11 @@ scene.add(plane);
 // 1. 环境光
 var light = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(light);
-// 2. 直线光
-var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-directionalLight.position.set(10, 10, 10);
-scene.add(directionalLight);
+
+// 聚光灯
+var spotlight = new THREE.SpotLight(0xffffff, 1);
+spotlight.position.set(5, 5, 5);
+scene.add(spotlight);
 
 // 初始化渲染器
 var renderer = new THREE.WebGLRenderer();
@@ -76645,27 +76646,29 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 
 // 设置渲染器开启阴影计算
 renderer.shadowMap.enabled = true;
+renderer.physicallyCorrectLights = true;
 // 光照要投射阴影
-directionalLight.castShadow = true;
+spotlight.castShadow = true;
 // 物体也要投射阴影
 sphere.castShadow = true;
 // 平面要捕获阴影
 plane.receiveShadow = true;
 
 // 设置阴影贴图模糊度
-directionalLight.shadow.radius = 20;
+spotlight.shadow.radius = 20;
 // 设置阴影贴图分辨率
-directionalLight.shadow.mapSize.set(2048, 2048);
-// 设置平行光投射相机的属性
-directionalLight.shadow.camera.near = 0.5;
-directionalLight.shadow.camera.far = 500;
-directionalLight.shadow.camera.top = 5;
-directionalLight.shadow.camera.bottom = -5;
-directionalLight.shadow.camera.left = -5;
-directionalLight.shadow.camera.right = 5;
-gui.add(directionalLight.shadow.camera, 'near').min(0).max(20).step(0.1).onChange(function () {
-  directionalLight.shadow.camera.updateProjectionMatrix();
-});
+spotlight.shadow.mapSize.set(4096, 4096);
+// 设置透视相机的属性
+spotlight.target = sphere;
+spotlight.angle = Math.PI / 6;
+spotlight.distance = 0;
+spotlight.penumbra = 0;
+spotlight.decay = 0;
+gui.add(sphere.position, 'x').min(-5).max(5).step(0.1);
+gui.add(spotlight, 'angle').min(0).max(Math.PI / 2).step(0.01);
+gui.add(spotlight, 'distance').min(0).max(20).step(0.1);
+gui.add(spotlight, 'penumbra').min(0).max(1).step(0.01);
+gui.add(spotlight, 'decay').min(0).max(5).step(0.01);
 
 // 将渲染内容canvas添加到body
 document.body.appendChild(renderer.domElement);
@@ -76715,7 +76718,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50739" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59337" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

@@ -1,5 +1,5 @@
 // 目标:
-// 详解聚光灯各种属性和应用
+// 平行光阴影属性和阴影相机原理
 
 import * as THREE from 'THREE';
 
@@ -30,7 +30,7 @@ scene.add(sphere)
 
 
 // 创建一个平面
-const planeGeometry = new THREE.PlaneGeometry(50, 50)
+const planeGeometry = new THREE.PlaneGeometry(10, 10)
 const plane = new THREE.Mesh(planeGeometry, material)
 plane.position.set(0, -1, 0)
 plane.rotation.x = -Math.PI / 2
@@ -45,14 +45,10 @@ scene.add(plane)
 // 1. 环境光
 const light = new THREE.AmbientLight(0xffffff, 0.5)
 scene.add(light)
-
-
-
-// 聚光灯
-const spotlight = new THREE.SpotLight(0xffffff, 1)
-spotlight.position.set(5, 5, 5)
-scene.add(spotlight)
-
+// 2. 直线光
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
+directionalLight.position.set(10, 10, 10)
+scene.add(directionalLight)
 
 // 初始化渲染器
 const renderer = new THREE.WebGLRenderer()
@@ -62,9 +58,8 @@ renderer.setSize(window.innerWidth, window.innerHeight)
 
 // 设置渲染器开启阴影计算
 renderer.shadowMap.enabled = true
-renderer.physicallyCorrectLights = true
 // 光照要投射阴影
-spotlight.castShadow = true
+directionalLight.castShadow = true
 // 物体也要投射阴影
 sphere.castShadow = true
 // 平面要捕获阴影
@@ -74,41 +69,26 @@ plane.receiveShadow = true
 
 
 // 设置阴影贴图模糊度
-spotlight.shadow.radius = 20
+directionalLight.shadow.radius = 20
 // 设置阴影贴图分辨率
-spotlight.shadow.mapSize.set(4096, 4096)
-// 设置透视相机的属性
-spotlight.target = sphere
-spotlight.angle = Math.PI / 6
-spotlight.distance = 0
-spotlight.penumbra = 0
-spotlight.decay = 0
+directionalLight.shadow.mapSize.set(2048, 2048)
+// 设置平行光投射相机的属性
+directionalLight.shadow.camera.near = 0.5
+directionalLight.shadow.camera.far = 500
+directionalLight.shadow.camera.top = 5
+directionalLight.shadow.camera.bottom = -5
+directionalLight.shadow.camera.left = -5
+directionalLight.shadow.camera.right = 5
 
 gui
-  .add(sphere.position, 'x')
-  .min(-5)
-  .max(5)
-  .step(0.1)
-gui
-  .add(spotlight, 'angle')
-  .min(0)
-  .max(Math.PI / 2)
-  .step(0.01)
-gui
-  .add(spotlight, 'distance')
+  .add(directionalLight.shadow.camera, 'near')
   .min(0)
   .max(20)
   .step(0.1)
-gui
-  .add(spotlight, 'penumbra')
-  .min(0)
-  .max(1)
-  .step(0.01)
-gui
-  .add(spotlight, 'decay')
-  .min(0)
-  .max(5)
-  .step(0.01)
+  .onChange(() => {
+    directionalLight.shadow.camera.updateProjectionMatrix()
+  })
+
 
 
 
