@@ -1,5 +1,5 @@
 // 目标:
-// 详解点光源各种属性和应用
+// 初识Points与点材质
 
 import * as THREE from 'THREE';
 
