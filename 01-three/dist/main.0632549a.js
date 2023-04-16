@@ -76602,7 +76602,7 @@ var dat = _interopRequireWildcard(require("dat.gui"));
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 详解聚光灯各种属性和应用
+// 详解点光源各种属性和应用
 
 // 导入轨道控制器
 
@@ -76632,11 +76632,16 @@ scene.add(plane);
 // 1. 环境光
 var light = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(light);
+var smallBall = new THREE.Mesh(new THREE.SphereGeometry(0.1, 20, 20), new THREE.MeshBasicMaterial({
+  color: 0xff0000
+}));
+smallBall.position.set(2, 2, 2);
 
 // 聚光灯
-var spotlight = new THREE.SpotLight(0xffffff, 1);
-spotlight.position.set(5, 5, 5);
-scene.add(spotlight);
+var pointLight = new THREE.PointLight(0xff0000, 1);
+pointLight.position.set(2, 2, 2);
+scene.add(smallBall);
+smallBall.add(pointLight);
 
 // 初始化渲染器
 var renderer = new THREE.WebGLRenderer();
@@ -76648,27 +76653,23 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.physicallyCorrectLights = true;
 // 光照要投射阴影
-spotlight.castShadow = true;
+pointLight.castShadow = true;
 // 物体也要投射阴影
 sphere.castShadow = true;
 // 平面要捕获阴影
 plane.receiveShadow = true;
 
+// 设置光照强度
+pointLight.intensity = 2;
 // 设置阴影贴图模糊度
-spotlight.shadow.radius = 20;
+pointLight.shadow.radius = 20;
 // 设置阴影贴图分辨率
-spotlight.shadow.mapSize.set(4096, 4096);
+pointLight.shadow.mapSize.set(4096, 4096);
 // 设置透视相机的属性
-spotlight.target = sphere;
-spotlight.angle = Math.PI / 6;
-spotlight.distance = 0;
-spotlight.penumbra = 0;
-spotlight.decay = 0;
-gui.add(sphere.position, 'x').min(-5).max(5).step(0.1);
-gui.add(spotlight, 'angle').min(0).max(Math.PI / 2).step(0.01);
-gui.add(spotlight, 'distance').min(0).max(20).step(0.1);
-gui.add(spotlight, 'penumbra').min(0).max(1).step(0.01);
-gui.add(spotlight, 'decay').min(0).max(5).step(0.01);
+pointLight.distance = 0;
+pointLight.decay = 0;
+gui.add(pointLight, 'distance').min(0).max(20).step(0.1);
+gui.add(pointLight, 'decay').min(0).max(5).step(0.01);
 
 // 将渲染内容canvas添加到body
 document.body.appendChild(renderer.domElement);
@@ -76682,9 +76683,14 @@ controls.enableDamping = true;
 // 添加坐标轴辅助器
 var axesHelper = new THREE.AxesHelper(5);
 scene.add(axesHelper);
+var clock = new THREE.Clock();
 
 // 设置渲染函数
 function render() {
+  var time = clock.getElapsedTime();
+  smallBall.position.x = Math.sin(time) * 3;
+  smallBall.position.z = Math.cos(time) * 3;
+  smallBall.position.y = 2 + Math.sin(time) * 1;
   controls.update();
   // 使用渲染器通过相机将场景渲染出来
   renderer.render(scene, camera);
