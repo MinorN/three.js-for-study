@@ -76602,7 +76602,7 @@ var dat = _interopRequireWildcard(require("dat.gui"));
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 解析点材质属性
+// 应用顶点着色打造星空
 
 // 导入轨道控制器
 
@@ -76614,16 +76614,19 @@ var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 0, 10);
 scene.add(camera);
-
-// 创建球几何体
-var sphereGeometry = new THREE.SphereGeometry(3, 30, 30);
-// const material = new THREE.MeshBasicMaterial({
-//   color: 0xff0000,
-//   wireframe: true
-// })
-// const mesh = new THREE.Mesh(sphereGeometry, material)
-// scene.add(mesh)
-
+var particlesGeometry = new THREE.BufferGeometry();
+var count = 5000;
+// 设置缓冲区数组
+var position = new Float32Array(count * 3);
+// 设置顶点
+// 设置顶点颜色
+var colors = new Float32Array(count * 3);
+for (var i = 0; i < count * 3; i++) {
+  position[i] = Math.random() * 30 - 15;
+  colors[i] = Math.random();
+}
+particlesGeometry.setAttribute('position', new THREE.BufferAttribute(position, 3));
+particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 // 创建点
 var pointMaterial = new THREE.PointsMaterial({
   size: 0.1,
@@ -76638,7 +76641,9 @@ pointMaterial.alphaMap = texture;
 pointMaterial.transparent = true;
 pointMaterial.depthWrite = false;
 pointMaterial.blending = THREE.AdditiveBlending;
-var points = new THREE.Points(sphereGeometry, pointMaterial);
+// 设置启用顶点颜色
+pointMaterial.vertexColors = true;
+var points = new THREE.Points(particlesGeometry, pointMaterial);
 scene.add(points);
 
 // 初始化渲染器
@@ -76694,7 +76699,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64262" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55067" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

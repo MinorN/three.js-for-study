@@ -1,5 +1,5 @@
 // 目标:
-// 解析点材质属性
+// 应用顶点着色打造星空
 
 import * as THREE from 'THREE';
 
@@ -18,17 +18,19 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 camera.position.set(0, 0, 10)
 scene.add(camera)
 
-
-
-// 创建球几何体
-const sphereGeometry = new THREE.SphereGeometry(3, 30, 30)
-// const material = new THREE.MeshBasicMaterial({
-//   color: 0xff0000,
-//   wireframe: true
-// })
-// const mesh = new THREE.Mesh(sphereGeometry, material)
-// scene.add(mesh)
-
+const particlesGeometry = new THREE.BufferGeometry()
+const count = 5000
+// 设置缓冲区数组
+const position = new Float32Array(count * 3)
+// 设置顶点
+// 设置顶点颜色
+const colors = new Float32Array(count * 3)
+for (let i = 0; i < count * 3; i++) {
+  position[i] = Math.random() * 30 - 15
+  colors[i] = Math.random()
+}
+particlesGeometry.setAttribute('position', new THREE.BufferAttribute(position, 3))
+particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
 // 创建点
 const pointMaterial = new THREE.PointsMaterial({
   size: 0.1,
@@ -43,7 +45,9 @@ pointMaterial.alphaMap = texture
 pointMaterial.transparent = true
 pointMaterial.depthWrite = false
 pointMaterial.blending = THREE.AdditiveBlending
-const points = new THREE.Points(sphereGeometry, pointMaterial)
+// 设置启用顶点颜色
+pointMaterial.vertexColors = true
+const points = new THREE.Points(particlesGeometry, pointMaterial)
 scene.add(points)
 
 
