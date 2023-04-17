@@ -76602,7 +76602,7 @@ var dat = _interopRequireWildcard(require("dat.gui"));
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 应用顶点着色打造星空
+// 雪花
 
 // 导入轨道控制器
 
@@ -76612,39 +76612,47 @@ var scene = new THREE.Scene();
 
 // 创建相机
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(0, 0, 10);
+camera.position.set(0, 0, 40);
 scene.add(camera);
-var particlesGeometry = new THREE.BufferGeometry();
-var count = 5000;
-// 设置缓冲区数组
-var position = new Float32Array(count * 3);
-// 设置顶点
-// 设置顶点颜色
-var colors = new Float32Array(count * 3);
-for (var i = 0; i < count * 3; i++) {
-  position[i] = Math.random() * 30 - 15;
-  colors[i] = Math.random();
+function createPoints(url) {
+  var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.5;
+  var particlesGeometry = new THREE.BufferGeometry();
+  var count = 5000;
+  // 设置缓冲区数组
+  var position = new Float32Array(count * 3);
+  // 设置顶点
+  // 设置顶点颜色
+  var colors = new Float32Array(count * 3);
+  for (var i = 0; i < count * 3; i++) {
+    position[i] = (Math.random() - 0.5) * 100;
+    colors[i] = Math.random();
+  }
+  particlesGeometry.setAttribute('position', new THREE.BufferAttribute(position, 3));
+  particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+  // 创建点
+  var pointMaterial = new THREE.PointsMaterial({
+    size: size,
+    color: 0xffff00,
+    sizeAttenuation: true // 是否因为相机深度而衰减
+  });
+  // 载入纹理
+  var textureLoader = new THREE.TextureLoader();
+  var texture = textureLoader.load(url);
+  pointMaterial.map = texture;
+  pointMaterial.alphaMap = texture;
+  pointMaterial.transparent = true;
+  pointMaterial.depthWrite = false;
+  pointMaterial.blending = THREE.AdditiveBlending;
+  // 设置启用顶点颜色
+  pointMaterial.vertexColors = true;
+  var points = new THREE.Points(particlesGeometry, pointMaterial);
+  scene.add(points);
+  return points;
 }
-particlesGeometry.setAttribute('position', new THREE.BufferAttribute(position, 3));
-particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-// 创建点
-var pointMaterial = new THREE.PointsMaterial({
-  size: 0.1,
-  color: 0xffff00,
-  sizeAttenuation: true // 是否因为相机深度而衰减
-});
-// 载入纹理
-var textureLoader = new THREE.TextureLoader();
-var texture = textureLoader.load("./textures/particles/1.png");
-pointMaterial.map = texture;
-pointMaterial.alphaMap = texture;
-pointMaterial.transparent = true;
-pointMaterial.depthWrite = false;
-pointMaterial.blending = THREE.AdditiveBlending;
-// 设置启用顶点颜色
-pointMaterial.vertexColors = true;
-var points = new THREE.Points(particlesGeometry, pointMaterial);
-scene.add(points);
+
+// const points = createPoints("./textures/minecraft.png")
+var points2 = createPoints("./textures/xh.png");
 
 // 初始化渲染器
 var renderer = new THREE.WebGLRenderer();
@@ -76663,9 +76671,14 @@ controls.enableDamping = true;
 // 添加坐标轴辅助器
 var axesHelper = new THREE.AxesHelper(5);
 scene.add(axesHelper);
+var clock = new THREE.Clock();
 
 // 设置渲染函数
 function render() {
+  var time = clock.getElapsedTime();
+  // points.rotation.x = time * 0.3
+  points2.rotation.x = time * 0.2;
+  points2.rotation.y = time * 0.05;
   controls.update();
   // 使用渲染器通过相机将场景渲染出来
   renderer.render(scene, camera);
