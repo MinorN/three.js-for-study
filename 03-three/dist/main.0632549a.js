@@ -74147,11 +74147,15 @@ var generateGalaxy = function generateGalaxy(params, scene) {
     // 当前点应该在那哪一条分支的角度
     var branchAngel = i % params.branch * (2 * Math.PI / params.branch);
     // 当前点距离圆心的距离
-    var distance = Math.random() * params.radius;
+    var distance = Math.random() * params.radius * Math.random();
     var current = 3 * i;
-    positions[current] = Math.cos(branchAngel) * distance;
-    positions[current + 1] = 0;
-    positions[current + 2] = Math.sin(branchAngel) * distance;
+    // 随机值
+    var randomX = Math.pow(Math.random() * 2 - 1, 3) * (params.radius - distance) / 5;
+    var randomY = Math.pow(Math.random() * 2 - 1, 3) * (params.radius - distance) / 5;
+    var randomZ = Math.pow(Math.random() * 2 - 1, 3) * (params.radius - distance) / 5;
+    positions[current] = Math.cos(branchAngel + distance * params.rotateScale + randomX) * distance;
+    positions[current + 1] = randomY;
+    positions[current + 2] = Math.sin(branchAngel + distance * params.rotateScale + randomZ) * distance;
   }
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
   // 设置点的材质
@@ -74171,12 +74175,13 @@ var generateGalaxy = function generateGalaxy(params, scene) {
   scene.add(points);
 };
 var params = {
-  count: 1000,
+  count: 10000,
   size: 0.1,
   radius: 5,
-  branch: 3,
+  branch: 20,
   color: '#ffffff',
-  url: '1'
+  url: '1',
+  rotateScale: 0.3
 };
 generateGalaxy(params, scene);
 
