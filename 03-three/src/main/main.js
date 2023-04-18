@@ -30,25 +30,35 @@ const generateGalaxy = (params, scene) => {
   const positions = new Float32Array(params.count * 3)
   // 设置顶点颜色
   const colors = new Float32Array(params.count * 3)
+  const centerColor = new THREE.Color(params.color)
+  const endColor = new THREE.Color(params.endColor)
   // 循环生成点
   for (let i = 0; i < params.count; i++) {
     // 当前点应该在那哪一条分支的角度
     const branchAngel = (i % params.branch) * (2 * Math.PI / params.branch)
     // 当前点距离圆心的距离
-    const distance = Math.random() * params.radius * Math.random()
+    const distance = Math.random() * params.radius * Math.pow(Math.random(), 3)
     const current = 3 * i
     // 随机值
     const randomX = Math.pow(Math.random() * 2 - 1, 3) * (params.radius - distance) / 5
     const randomY = Math.pow(Math.random() * 2 - 1, 3) * (params.radius - distance) / 5
     const randomZ = Math.pow(Math.random() * 2 - 1, 3) * (params.radius - distance) / 5
-    positions[current] = Math.cos(branchAngel + distance * params.rotateScale + randomX) * distance
+    positions[current] = Math.cos(branchAngel + distance * params.rotateScale) * distance + randomX
     positions[current + 1] = randomY
-    positions[current + 2] = Math.sin(branchAngel + distance * params.rotateScale + randomZ) * distance
+    positions[current + 2] = Math.sin(branchAngel + distance * params.rotateScale) * distance + randomZ
+
+    // 混合颜色形成渐变
+    const mixColor = centerColor.clone()
+    mixColor.lerp(endColor, distance / params.radius)
+    colors[current] = mixColor.r
+    colors[current + 1] = mixColor.g
+    colors[current + 2] = mixColor.b
   }
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
   // 设置点的材质
   material = new THREE.PointsMaterial({
-    color: new THREE.Color(params.color),
+    // color: new THREE.Color(params.Color),
     size: params.size,
     sizeAttenuation: true,
     depthWrite: false,
@@ -56,7 +66,7 @@ const generateGalaxy = (params, scene) => {
     map: particlesTexture,
     alphaMap: particlesTexture,
     transparent: true,
-    // vertexColors: true
+    vertexColors: true
   })
   const points = new THREE.Points(geometry, material)
   scene.add(points)
@@ -66,7 +76,8 @@ const params = {
   size: 0.1,
   radius: 5,
   branch: 20,
-  color: '#ffffff',
+  color: '#ff6030',
+  endColor: '#1b3984',
   url: '1',
   rotateScale: 0.3
 }
