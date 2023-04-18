@@ -76602,7 +76602,7 @@ var dat = _interopRequireWildcard(require("dat.gui"));
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 雪花
+// 打造复杂形状臂旋星系
 
 // 导入轨道控制器
 
@@ -76612,47 +76612,52 @@ var scene = new THREE.Scene();
 
 // 创建相机
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(0, 0, 40);
+camera.position.set(0, 0, 10);
 scene.add(camera);
-function createPoints(url) {
-  var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.5;
-  var particlesGeometry = new THREE.BufferGeometry();
-  var count = 5000;
-  // 设置缓冲区数组
-  var position = new Float32Array(count * 3);
-  // 设置顶点
-  // 设置顶点颜色
-  var colors = new Float32Array(count * 3);
-  for (var i = 0; i < count * 3; i++) {
-    position[i] = (Math.random() - 0.5) * 100;
-    colors[i] = Math.random();
-  }
-  particlesGeometry.setAttribute('position', new THREE.BufferAttribute(position, 3));
-  particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-  // 创建点
-  var pointMaterial = new THREE.PointsMaterial({
-    size: size,
-    color: 0xffff00,
-    sizeAttenuation: true // 是否因为相机深度而衰减
-  });
-  // 载入纹理
+var geometry = null;
+var material = null;
+var generateGalaxy = function generateGalaxy(params, scene) {
   var textureLoader = new THREE.TextureLoader();
-  var texture = textureLoader.load(url);
-  pointMaterial.map = texture;
-  pointMaterial.alphaMap = texture;
-  pointMaterial.transparent = true;
-  pointMaterial.depthWrite = false;
-  pointMaterial.blending = THREE.AdditiveBlending;
-  // 设置启用顶点颜色
-  pointMaterial.vertexColors = true;
-  var points = new THREE.Points(particlesGeometry, pointMaterial);
-  scene.add(points);
-  return points;
-}
+  var particlesTexture = textureLoader.load("./textures/particles/".concat(params.url, ".png"));
+  // 生成顶点
+  geometry = new THREE.BufferGeometry();
+  // 随机生成位置
+  var positions = new Float32Array(params.count * 3);
+  // 设置顶点颜色
+  var colors = new Float32Array(params.count * 3);
+  // 循环生成点
+  for (var i = 0; i < params.count; i++) {
+    var current = 3 * i;
+    positions[current] = Math.random() * params.radius;
+    positions[current + 1] = 0;
+    positions[current + 2] = 0;
+  }
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  // 设置点的材质
+  material = new THREE.PointsMaterial({
+    color: new THREE.Color(params.color),
+    size: params.size,
+    sizeAttenuation: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    map: particlesTexture,
+    alphaMap: particlesTexture,
+    transparent: true
+    // vertexColors: true
+  });
 
-// const points = createPoints("./textures/minecraft.png")
-var points2 = createPoints("./textures/xh.png");
+  var points = new THREE.Points(geometry, material);
+  scene.add(points);
+};
+var params = {
+  count: 100,
+  size: 0.1,
+  radius: 5,
+  branch: 3,
+  color: '#ffffff',
+  url: '1'
+};
+generateGalaxy(params, scene);
 
 // 初始化渲染器
 var renderer = new THREE.WebGLRenderer();
@@ -76676,9 +76681,6 @@ var clock = new THREE.Clock();
 // 设置渲染函数
 function render() {
   var time = clock.getElapsedTime();
-  // points.rotation.x = time * 0.3
-  points2.rotation.x = time * 0.2;
-  points2.rotation.y = time * 0.05;
   controls.update();
   // 使用渲染器通过相机将场景渲染出来
   renderer.render(scene, camera);
@@ -76712,7 +76714,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55067" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64127" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

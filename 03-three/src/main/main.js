@@ -1,5 +1,5 @@
 // 目标:
-// 雪花
+// 打造复杂形状臂旋星系
 
 import * as THREE from 'THREE';
 
@@ -15,49 +15,55 @@ const scene = new THREE.Scene()
 
 // 创建相机
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-camera.position.set(0, 0, 40)
+camera.position.set(0, 0, 10)
 scene.add(camera)
 
 
-function createPoints (url, size = 0.5) {
-  const particlesGeometry = new THREE.BufferGeometry()
-  const count = 5000
-  // 设置缓冲区数组
-  const position = new Float32Array(count * 3)
-  // 设置顶点
-  // 设置顶点颜色
-  const colors = new Float32Array(count * 3)
-  for (let i = 0; i < count * 3; i++) {
-    position[i] = (Math.random() - 0.5) * 100
-    colors[i] = Math.random()
-  }
-  particlesGeometry.setAttribute('position', new THREE.BufferAttribute(position, 3))
-  particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
 
-  // 创建点
-  const pointMaterial = new THREE.PointsMaterial({
-    size: size,
-    color: 0xffff00,
-    sizeAttenuation: true, // 是否因为相机深度而衰减
-  })
-  // 载入纹理
+let geometry = null
+let material = null
+const generateGalaxy = (params, scene) => {
   const textureLoader = new THREE.TextureLoader()
-  const texture = textureLoader.load(url)
-  pointMaterial.map = texture
-  pointMaterial.alphaMap = texture
-  pointMaterial.transparent = true
-  pointMaterial.depthWrite = false
-  pointMaterial.blending = THREE.AdditiveBlending
-  // 设置启用顶点颜色
-  pointMaterial.vertexColors = true
-  const points = new THREE.Points(particlesGeometry, pointMaterial)
+
+  const particlesTexture = textureLoader.load(`./textures/particles/${params.url}.png`)
+  // 生成顶点
+  geometry = new THREE.BufferGeometry()
+  // 随机生成位置
+  const positions = new Float32Array(params.count * 3)
+  // 设置顶点颜色
+  const colors = new Float32Array(params.count * 3)
+  // 循环生成点
+  for (let i = 0; i < params.count; i++) {
+    const current = 3 * i
+    positions[current] = Math.random() * params.radius
+    positions[current + 1] = 0
+    positions[current + 2] = 0
+  }
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  // 设置点的材质
+  material = new THREE.PointsMaterial({
+    color: new THREE.Color(params.color),
+    size: params.size,
+    sizeAttenuation: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    map: particlesTexture,
+    alphaMap: particlesTexture,
+    transparent: true,
+    // vertexColors: true
+  })
+  const points = new THREE.Points(geometry, material)
   scene.add(points)
-  return points
 }
-
-// const points = createPoints("./textures/minecraft.png")
-const points2 = createPoints("./textures/xh.png",)
-
+const params = {
+  count: 100,
+  size: 0.1,
+  radius: 5,
+  branch: 3,
+  color: '#ffffff',
+  url: '1'
+}
+generateGalaxy(params, scene)
 
 
 // 初始化渲染器
@@ -83,9 +89,6 @@ let clock = new THREE.Clock()
 // 设置渲染函数
 function render () {
   let time = clock.getElapsedTime()
-  // points.rotation.x = time * 0.3
-  points2.rotation.x = time * 0.2
-  points2.rotation.y = time * 0.05
   controls.update()
   // 使用渲染器通过相机将场景渲染出来
   renderer.render(scene, camera)
