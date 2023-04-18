@@ -6,10 +6,8 @@ import * as THREE from 'THREE';
 // 导入轨道控制器
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-import * as dat from 'dat.gui';
 
 
-const gui = new dat.GUI()
 // 创建场景
 const scene = new THREE.Scene()
 
@@ -34,10 +32,14 @@ const generateGalaxy = (params, scene) => {
   const colors = new Float32Array(params.count * 3)
   // 循环生成点
   for (let i = 0; i < params.count; i++) {
+    // 当前点应该在那哪一条分支的角度
+    const branchAngel = (i % params.branch) * (2 * Math.PI / params.branch)
+    // 当前点距离圆心的距离
+    const distance = Math.random() * params.radius
     const current = 3 * i
-    positions[current] = Math.random() * params.radius
+    positions[current] = Math.cos(branchAngel) * distance
     positions[current + 1] = 0
-    positions[current + 2] = 0
+    positions[current + 2] = Math.sin(branchAngel) * distance
   }
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
   // 设置点的材质
@@ -56,7 +58,7 @@ const generateGalaxy = (params, scene) => {
   scene.add(points)
 }
 const params = {
-  count: 100,
+  count: 1000,
   size: 0.1,
   radius: 5,
   branch: 3,
