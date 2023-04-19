@@ -37,6 +37,39 @@ for (let i = 0; i < 5; i++) {
 }
 scene.add(cubeGroup)
 
+
+// 创建三角形酷炫物体
+let sjxMesh
+let sjxGroup = new THREE.Group()
+for (let i = 0; i < 50; i++) {
+  const geometry = new THREE.BufferGeometry()
+  const positionArray = new Float32Array(9)
+  // 每个三角形需要3个顶点，每个顶点需要三个值
+  for (let j = 0; j < 9; j++) {
+    if (j % 3 === 1) {
+      positionArray[j] = Math.random() * 10 - 5
+    } else {
+      positionArray[j] = Math.random() * 10 - 5
+    }
+  }
+  let color = new THREE.Color(Math.random(), Math.random(), Math.random())
+
+  geometry.setAttribute('position', new THREE.BufferAttribute(positionArray, 3))
+  const material = new THREE.MeshBasicMaterial({
+    color,
+    transparent: true,
+    opacity: 0.5,
+    side: THREE.DoubleSide
+  })
+  sjxMesh = new THREE.Mesh(geometry, material)
+  sjxGroup.add(sjxMesh)
+
+}
+sjxGroup.position.set(0, -30, 0)
+scene.add(sjxGroup)
+
+
+
 // 创建投射光线对象
 const raycaster = new THREE.Raycaster()
 
@@ -84,6 +117,10 @@ function render () {
   let time = clock.getElapsedTime()
   cubeGroup.rotation.x = time * 0.5
   cubeGroup.rotation.y = time * 0.5
+  sjxGroup.rotation.x = time * 0.4
+  sjxGroup.rotation.z = time * 0.3
+  // 根据当前滚动的scrolly，去设置相机移动位置
+  camera.position.y = -(window.scrollY / window.innerHeight) * 30
 
 
   // 使用渲染器通过相机将场景渲染出来
@@ -95,3 +132,12 @@ function render () {
 }
 render()
 
+// 设置当前页
+let currentPage = 0
+// 监听滚动事件
+window.addEventListener('scroll', () => {
+  const newPage = Math.round(window.scrollY / window.innerHeight)
+  if (newPage !== currentPage) {
+    currentPage = newPage
+  }
+})

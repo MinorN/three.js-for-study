@@ -74153,6 +74153,34 @@ for (var i = 0; i < 5; i++) {
 }
 scene.add(cubeGroup);
 
+// 创建三角形酷炫物体
+var sjxMesh;
+var sjxGroup = new THREE.Group();
+for (var _i = 0; _i < 50; _i++) {
+  var geometry = new THREE.BufferGeometry();
+  var positionArray = new Float32Array(9);
+  // 每个三角形需要3个顶点，每个顶点需要三个值
+  for (var _j = 0; _j < 9; _j++) {
+    if (_j % 3 === 1) {
+      positionArray[_j] = Math.random() * 10 - 5;
+    } else {
+      positionArray[_j] = Math.random() * 10 - 5;
+    }
+  }
+  var color = new THREE.Color(Math.random(), Math.random(), Math.random());
+  geometry.setAttribute('position', new THREE.BufferAttribute(positionArray, 3));
+  var _material = new THREE.MeshBasicMaterial({
+    color: color,
+    transparent: true,
+    opacity: 0.5,
+    side: THREE.DoubleSide
+  });
+  sjxMesh = new THREE.Mesh(geometry, _material);
+  sjxGroup.add(sjxMesh);
+}
+sjxGroup.position.set(0, -30, 0);
+scene.add(sjxGroup);
+
 // 创建投射光线对象
 var raycaster = new THREE.Raycaster();
 
@@ -74197,6 +74225,10 @@ function render() {
   var time = clock.getElapsedTime();
   cubeGroup.rotation.x = time * 0.5;
   cubeGroup.rotation.y = time * 0.5;
+  sjxGroup.rotation.x = time * 0.4;
+  sjxGroup.rotation.z = time * 0.3;
+  // 根据当前滚动的scrolly，去设置相机移动位置
+  camera.position.y = -(window.scrollY / window.innerHeight) * 30;
 
   // 使用渲染器通过相机将场景渲染出来
   renderer.render(scene, camera);
@@ -74205,6 +74237,16 @@ function render() {
   requestAnimationFrame(render);
 }
 render();
+
+// 设置当前页
+var currentPage = 0;
+// 监听滚动事件
+window.addEventListener('scroll', function () {
+  var newPage = Math.round(window.scrollY / window.innerHeight);
+  if (newPage !== currentPage) {
+    currentPage = newPage;
+  }
+});
 },{"THREE":"../node_modules/THREE/build/three.module.js","three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
