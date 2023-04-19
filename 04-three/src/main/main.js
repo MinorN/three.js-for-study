@@ -1,5 +1,5 @@
 // 目标:
-// 精讲投射管线实现三维物体交互
+// 打造3d炫酷官网
 
 import * as THREE from 'THREE';
 
