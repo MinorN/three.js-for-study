@@ -311,5 +311,12 @@ window.addEventListener('scroll', () => {
       z: "+=" + Math.PI,
       duration: 1,
     })
+
+    // gsap.to(`.page${currentPage} h1`, {
+    //   rotate: '+=' + 360,
+    //   duration: 1
+    // })
+    gsap.fromTo(`.page${currentPage} h1`, { x: -300 }, { x: 0, rotate: '+=' + 360, duration: 1 })
+
   }
 })

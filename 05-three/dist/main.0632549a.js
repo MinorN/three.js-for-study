@@ -79802,6 +79802,18 @@ window.addEventListener('scroll', function () {
       z: "+=" + Math.PI,
       duration: 1
     });
+
+    // gsap.to(`.page${currentPage} h1`, {
+    //   rotate: '+=' + 360,
+    //   duration: 1
+    // })
+    _gsap.default.fromTo(".page".concat(currentPage, " h1"), {
+      x: -300
+    }, {
+      x: 0,
+      rotate: '+=' + 360,
+      duration: 1
+    });
   }
 });
 },{"THREE":"../node_modules/THREE/build/three.module.js","three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js","gsap":"../node_modules/gsap/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
