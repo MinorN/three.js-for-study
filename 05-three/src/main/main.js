@@ -5,7 +5,7 @@ import * as THREE from 'THREE';
 
 // 导入轨道控制器
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-
+import gsap from 'gsap'
 
 
 // 创建场景
@@ -29,7 +29,7 @@ for (let i = 0; i < 5; i++) {
   for (let j = 0; j < 5; j++) {
     for (let z = 0; z < 5; z++) {
       const cube = new THREE.Mesh(cubeGeometry, material)
-      cube.position.set(i * 2 - 5, j * 2 - 5, z * 2 - 5)
+      cube.position.set(i * 2 - 4, j * 2 - 4, z * 2 - 4)
       cubeArr.push(cube)
       cubeGroup.add(cube)
     }
@@ -178,6 +178,7 @@ generateGalaxy(params, scene)
 
 
 
+let arrGroup = [cubeGroup, sjxGroup, sphereGroup, XXGroup]
 
 
 
@@ -253,17 +254,39 @@ document.body.appendChild(renderer.domElement)
 
 const clock = new THREE.Clock()
 
+gsap.to(cubeGroup.rotation, {
+  x: "+=" + Math.PI,
+  y: "+=" + Math.PI,
+  duration: 5,
+  repeat: -1,
+  ease: "none"
+})
+
+gsap.to(sjxGroup.rotation, {
+  x: "+=" + Math.PI,
+  z: "+=" + Math.PI,
+  duration: 5,
+  repeat: -1,
+  ease: "none"
+})
+
+gsap.to(smallBall.position, {
+  x: -3,
+  z: 2,
+  duration: 6,
+  repeat: -1,
+  ease: "none",
+  yoyo: true
+})
+
+
 // 设置渲染函数
 function render () {
   // controls.update()
-  let time = clock.getElapsedTime()
-  cubeGroup.rotation.x = time * 0.5
-  cubeGroup.rotation.y = time * 0.5
-  sjxGroup.rotation.x = time * 0.4
-  sjxGroup.rotation.z = time * 0.3
-  smallBall.position.x = Math.sin(time) * 3
-  smallBall.position.z = Math.cos(time) * 3
-  smallBall.position.y = 2 + Math.sin(time) * 1
+
+  // smallBall.position.x = Math.sin(time) * 3
+  // smallBall.position.z = Math.cos(time) * 3
+  // smallBall.position.y = 2 + Math.sin(time) * 1
   // 根据当前滚动的scrolly，去设置相机移动位置
   camera.position.y = -(window.scrollY / window.innerHeight) * 30
 
@@ -284,5 +307,9 @@ window.addEventListener('scroll', () => {
   const newPage = Math.round(window.scrollY / window.innerHeight)
   if (newPage !== currentPage) {
     currentPage = newPage
+    gsap.to(arrGroup[currentPage].rotation, {
+      z: "+=" + Math.PI,
+      duration: 1,
+    })
   }
 })
