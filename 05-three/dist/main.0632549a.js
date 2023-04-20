@@ -74157,7 +74157,7 @@ scene.add(cubeGroup);
 var sjxMesh;
 var sjxGroup = new THREE.Group();
 for (var _i = 0; _i < 50; _i++) {
-  var geometry = new THREE.BufferGeometry();
+  var _geometry = new THREE.BufferGeometry();
   var positionArray = new Float32Array(9);
   // 每个三角形需要3个顶点，每个顶点需要三个值
   for (var _j = 0; _j < 9; _j++) {
@@ -74168,18 +74168,115 @@ for (var _i = 0; _i < 50; _i++) {
     }
   }
   var color = new THREE.Color(Math.random(), Math.random(), Math.random());
-  geometry.setAttribute('position', new THREE.BufferAttribute(positionArray, 3));
+  _geometry.setAttribute('position', new THREE.BufferAttribute(positionArray, 3));
   var _material = new THREE.MeshBasicMaterial({
     color: color,
     transparent: true,
     opacity: 0.5,
     side: THREE.DoubleSide
   });
-  sjxMesh = new THREE.Mesh(geometry, _material);
+  sjxMesh = new THREE.Mesh(_geometry, _material);
   sjxGroup.add(sjxMesh);
 }
 sjxGroup.position.set(0, -30, 0);
 scene.add(sjxGroup);
+
+// 小球
+// 添加一个球
+var sphereGroup = new THREE.Group();
+var sphereGeometry = new THREE.SphereGeometry(1, 20, 20);
+var sphereMaterial = new THREE.MeshStandardMaterial();
+var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+sphereGroup.add(sphere);
+
+// // 创建一个平面
+// const planeGeometry = new THREE.PlaneGeometry(50, 50)
+// const plane = new THREE.Mesh(planeGeometry, sphereMaterial)
+// plane.position.set(0, -1, 0)
+// plane.rotation.x = -Math.PI / 2
+// scene.add(plane)
+
+// 灯光
+// 1. 环境光
+var light = new THREE.AmbientLight(0xffffff, 0.5);
+sphereGroup.add(light);
+var smallBall = new THREE.Mesh(new THREE.SphereGeometry(0.1, 20, 20), new THREE.MeshBasicMaterial({
+  color: 0xff0000
+}));
+smallBall.position.set(2, 2, 2);
+// 聚光灯
+var pointLight = new THREE.PointLight(0xff0000, 1);
+pointLight.position.set(2, 2, 2);
+sphereGroup.add(smallBall);
+smallBall.add(pointLight);
+scene.add(sphereGroup);
+sphereGroup.position.set(0, -60, 0);
+var geometry = null;
+var xxMaterial = null;
+var XXGroup = new THREE.Group();
+var generateGalaxy = function generateGalaxy(params, scene) {
+  var textureLoader = new THREE.TextureLoader();
+  var particlesTexture = textureLoader.load("./textures/particles/".concat(params.url, ".png"));
+  // 生成顶点
+  geometry = new THREE.BufferGeometry();
+  // 随机生成位置
+  var positions = new Float32Array(params.count * 3);
+  // 设置顶点颜色
+  var colors = new Float32Array(params.count * 3);
+  var centerColor = new THREE.Color(params.color);
+  var endColor = new THREE.Color(params.endColor);
+  // 循环生成点
+  for (var _i2 = 0; _i2 < params.count; _i2++) {
+    // 当前点应该在那哪一条分支的角度
+    var branchAngel = _i2 % params.branch * (2 * Math.PI / params.branch);
+    // 当前点距离圆心的距离
+    var distance = Math.random() * params.radius * Math.pow(Math.random(), 3);
+    var current = 3 * _i2;
+    // 随机值
+    var randomX = Math.pow(Math.random() * 2 - 1, 3) * (params.radius - distance) / 5;
+    var randomY = Math.pow(Math.random() * 2 - 1, 3) * (params.radius - distance) / 5;
+    var randomZ = Math.pow(Math.random() * 2 - 1, 3) * (params.radius - distance) / 5;
+    positions[current] = Math.cos(branchAngel + distance * params.rotateScale) * distance + randomX;
+    positions[current + 1] = randomY;
+    positions[current + 2] = Math.sin(branchAngel + distance * params.rotateScale) * distance + randomZ;
+
+    // 混合颜色形成渐变
+    var mixColor = centerColor.clone();
+    mixColor.lerp(endColor, distance / params.radius);
+    colors[current] = mixColor.r;
+    colors[current + 1] = mixColor.g;
+    colors[current + 2] = mixColor.b;
+  }
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  // 设置点的材质
+  xxMaterial = new THREE.PointsMaterial({
+    // color: new THREE.Color(params.Color),
+    size: params.size,
+    sizeAttenuation: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    map: particlesTexture,
+    alphaMap: particlesTexture,
+    transparent: true,
+    vertexColors: true
+  });
+  var points = new THREE.Points(geometry, xxMaterial);
+  XXGroup.add(points);
+  scene.add(XXGroup);
+  XXGroup.position.set(0, -90, 0);
+};
+var params = {
+  count: 10000,
+  size: 0.1,
+  radius: 20,
+  branch: 20,
+  color: '#ff6030',
+  endColor: '#1b3984',
+  url: '1',
+  rotateScale: 0.3
+};
+generateGalaxy(params, scene);
 
 // 创建投射光线对象
 var raycaster = new THREE.Raycaster();
@@ -74205,6 +74302,26 @@ var renderer = new THREE.WebGLRenderer({
 // 设置渲染尺寸大小
 renderer.setSize(window.innerWidth, window.innerHeight);
 
+// 设置渲染器开启阴影计算
+renderer.shadowMap.enabled = true;
+renderer.physicallyCorrectLights = true;
+// 光照要投射阴影
+pointLight.castShadow = true;
+// 物体也要投射阴影
+sphere.castShadow = true;
+// 平面要捕获阴影
+// plane.receiveShadow = true
+
+// 设置光照强度
+pointLight.intensity = 2;
+// 设置阴影贴图模糊度
+pointLight.shadow.radius = 20;
+// 设置阴影贴图分辨率
+pointLight.shadow.mapSize.set(4096, 4096);
+// 设置透视相机的属性
+pointLight.distance = 0;
+pointLight.decay = 0;
+
 // 将渲染内容canvas添加到body
 document.body.appendChild(renderer.domElement);
 
@@ -74215,8 +74332,9 @@ document.body.appendChild(renderer.domElement);
 // controls.enableDamping = true
 
 // 添加坐标轴辅助器
-var axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper);
+// const axesHelper = new THREE.AxesHelper(5)
+// scene.add(axesHelper)
+
 var clock = new THREE.Clock();
 
 // 设置渲染函数
@@ -74227,6 +74345,9 @@ function render() {
   cubeGroup.rotation.y = time * 0.5;
   sjxGroup.rotation.x = time * 0.4;
   sjxGroup.rotation.z = time * 0.3;
+  smallBall.position.x = Math.sin(time) * 3;
+  smallBall.position.z = Math.cos(time) * 3;
+  smallBall.position.y = 2 + Math.sin(time) * 1;
   // 根据当前滚动的scrolly，去设置相机移动位置
   camera.position.y = -(window.scrollY / window.innerHeight) * 30;
 
@@ -74272,7 +74393,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61284" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63100" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
