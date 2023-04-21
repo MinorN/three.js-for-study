@@ -79708,6 +79708,10 @@ window.addEventListener('click', function (e) {
     return item.object.material = redMaterial;
   });
 });
+window.addEventListener('mousemove', function (e) {
+  mouse.x = e.clientX / window.innerWidth - 0.5;
+  mouse.y = e.clientY / window.innerHeight - 0.5;
+});
 
 // 初始化渲染器
 var renderer = new THREE.WebGLRenderer({
@@ -79776,12 +79780,13 @@ _gsap.default.to(smallBall.position, {
 // 设置渲染函数
 function render() {
   // controls.update()
-
+  var time = clock.getDelta();
   // smallBall.position.x = Math.sin(time) * 3
   // smallBall.position.z = Math.cos(time) * 3
   // smallBall.position.y = 2 + Math.sin(time) * 1
   // 根据当前滚动的scrolly，去设置相机移动位置
   camera.position.y = -(window.scrollY / window.innerHeight) * 30;
+  camera.position.x += (mouse.x * 10 - camera.position.x) * time * 5;
 
   // 使用渲染器通过相机将场景渲染出来
   renderer.render(scene, camera);
@@ -79841,7 +79846,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63100" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50471" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

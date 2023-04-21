@@ -200,6 +200,11 @@ window.addEventListener('click', (e) => {
   result.forEach(item => item.object.material = redMaterial)
 })
 
+window.addEventListener('mousemove', (e) => {
+  mouse.x = e.clientX / window.innerWidth - 0.5
+  mouse.y = e.clientY / window.innerHeight - 0.5
+})
+
 
 
 
@@ -283,13 +288,13 @@ gsap.to(smallBall.position, {
 // 设置渲染函数
 function render () {
   // controls.update()
-
+  let time = clock.getDelta()
   // smallBall.position.x = Math.sin(time) * 3
   // smallBall.position.z = Math.cos(time) * 3
   // smallBall.position.y = 2 + Math.sin(time) * 1
   // 根据当前滚动的scrolly，去设置相机移动位置
   camera.position.y = -(window.scrollY / window.innerHeight) * 30
-
+  camera.position.x += (mouse.x * 10 - camera.position.x) * time * 5
 
   // 使用渲染器通过相机将场景渲染出来
   renderer.render(scene, camera)
@@ -320,3 +325,5 @@ window.addEventListener('scroll', () => {
 
   }
 })
+
+
