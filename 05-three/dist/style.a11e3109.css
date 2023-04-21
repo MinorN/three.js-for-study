@@ -7,6 +7,7 @@ body{
     background: rgb(36,58,66);
 }
 
+
 canvas{
     position: fixed;
     left: 0;
@@ -28,6 +29,10 @@ canvas{
 }
 .page h3{
     font-size: 30px;
+}
+
+::-webkit-scrollbar{
+    display: none;
 }
 
 /*# sourceMappingURL=/style.a11e3109.css.map */
