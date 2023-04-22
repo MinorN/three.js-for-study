@@ -88260,11 +88260,10 @@ var CANNON = _interopRequireWildcard(require("cannon-es"));
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 使用cannon引擎
+// 创建物理世界
 
 // 导入轨道控制器
 
-console.log(CANNON);
 var gui = new dat.GUI();
 // 创建场景
 var scene = new THREE.Scene();
@@ -88274,56 +88273,57 @@ var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHei
 camera.position.set(0, 0, 10);
 scene.add(camera);
 
-// 创建一个平面
-var material = new THREE.MeshStandardMaterial();
-var planeGeometry = new THREE.PlaneGeometry(50, 50);
-var plane = new THREE.Mesh(planeGeometry, material);
-plane.position.set(0, -1, 0);
-plane.rotation.x = -Math.PI / 2;
-scene.add(plane);
+// 创建球和平面
+var sphereGeometry = new THREE.SphereGeometry(1, 20, 20);
+var sphereMaterial = new THREE.MeshStandardMaterial();
+var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+sphere.castShadow = true;
+scene.add(sphere);
+var floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshStandardMaterial());
+floor.position.set(0, -5, 0);
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
 
-// 灯光
-// 1. 环境光
-var light = new THREE.AmbientLight(0xffffff, 0.5);
-scene.add(light);
+// 添加环境光
+var ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+// 添加平行光
+var dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+dirLight.castShadow = true;
+scene.add(dirLight);
 
-// 聚光灯
-var pointLight = new THREE.PointLight(0xff0000, 1);
-pointLight.position.set(2, 2, 2);
-scene.add(pointLight);
+// 设置物体材质
+var sphereWorldMaterial = new CANNON.Material();
+
+// 创建物理世界
+var world = new CANNON.World();
+world.gravity.set(0, -9.8, 0);
+// 创建物理世界小球形状
+var sphereShape = new CANNON.Sphere(1);
+// 创建物理世界物体
+var sphereBody = new CANNON.Body({
+  shape: sphereShape,
+  position: new CANNON.Vec3(0, 0, 0),
+  // 小球质量
+  mass: 1,
+  // 物体材质
+  material: sphereWorldMaterial
+});
+// 将物体添加到物理世界
+world.addBody(sphereBody);
 
 // 初始化渲染器
 var renderer = new THREE.WebGLRenderer();
-
+renderer.shadowMap.enabled = true;
 // 设置渲染尺寸大小
 renderer.setSize(window.innerWidth, window.innerHeight);
-
-// 设置渲染器开启阴影计算
-renderer.shadowMap.enabled = true;
-renderer.physicallyCorrectLights = true;
-// 光照要投射阴影
-pointLight.castShadow = true;
-// 物体也要投射阴影
-// sphere.castShadow = true
-// 平面要捕获阴影
-plane.receiveShadow = true;
-
-// 设置光照强度
-pointLight.intensity = 2;
-// 设置阴影贴图模糊度
-pointLight.shadow.radius = 20;
-// 设置阴影贴图分辨率
-pointLight.shadow.mapSize.set(4096, 4096);
-// 设置透视相机的属性
-pointLight.distance = 0;
-pointLight.decay = 0;
 
 // 将渲染内容canvas添加到body
 document.body.appendChild(renderer.domElement);
 
 // 创建轨道控制器
 var controls = new _OrbitControls.OrbitControls(camera, renderer.domElement);
-
 // 设置控制器阻尼，让控制器更加真实，必须在动画循环里调用update
 controls.enableDamping = true;
 
@@ -88331,14 +88331,16 @@ controls.enableDamping = true;
 var axesHelper = new THREE.AxesHelper(5);
 scene.add(axesHelper);
 var clock = new THREE.Clock();
-
 // 设置渲染函数
 function render() {
-  var time = clock.getElapsedTime();
-  controls.update();
+  var deltaTime = clock.getDelta();
+
+  // controls.update()
+  // 更新物理引擎里面世界的物体
+  world.step(1 / 144, deltaTime);
+  sphere.position.copy(sphereBody.position);
   // 使用渲染器通过相机将场景渲染出来
   renderer.render(scene, camera);
-
   // 下一帧继续render
   requestAnimationFrame(render);
 }
@@ -88368,7 +88370,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60432" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64205" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
