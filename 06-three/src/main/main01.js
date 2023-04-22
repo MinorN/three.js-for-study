@@ -1,5 +1,5 @@
 // 目标:
-// 设置固定地面，小球撞击
+// 创建物理世界
 
 import * as THREE from 'THREE';
 
@@ -68,16 +68,6 @@ const sphereBody = new CANNON.Body({
 })
 // 将物体添加到物理世界
 world.addBody(sphereBody)
-
-// 创建物理世界地面
-const floorShape = new CANNON.Plane()
-const floorBody = new CANNON.Body()
-floorBody.mass = 0 // 保持不动，也就是mass为0
-floorBody.addShape(floorShape)
-floorBody.position.set(0, -5, 0)
-floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2)
-world.addBody(floorBody)
-
 
 
 

@@ -88260,7 +88260,7 @@ var CANNON = _interopRequireWildcard(require("cannon-es"));
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 创建物理世界
+// 设置固定地面，小球撞击
 
 // 导入轨道控制器
 
@@ -88312,6 +88312,15 @@ var sphereBody = new CANNON.Body({
 });
 // 将物体添加到物理世界
 world.addBody(sphereBody);
+
+// 创建物理世界地面
+var floorShape = new CANNON.Plane();
+var floorBody = new CANNON.Body();
+floorBody.mass = 0; // 保持不动，也就是mass为0
+floorBody.addShape(floorShape);
+floorBody.position.set(0, -5, 0);
+floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+world.addBody(floorBody);
 
 // 初始化渲染器
 var renderer = new THREE.WebGLRenderer();
