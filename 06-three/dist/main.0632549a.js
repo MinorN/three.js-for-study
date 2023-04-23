@@ -88260,7 +88260,7 @@ var CANNON = _interopRequireWildcard(require("cannon-es"));
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 关联材质设置摩擦与弹性系数
+// 立方体相互碰撞后旋转效果
 
 // 导入轨道控制器
 
@@ -88272,13 +88272,48 @@ var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 0, 10);
 scene.add(camera);
+var cubeArr = [];
+function createCube() {
+  // 创建立方体和平面
+  var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+  var cubeMaterial = new THREE.MeshStandardMaterial();
+  var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+  cube.castShadow = true;
+  scene.add(cube);
 
-// 创建球和平面
-var sphereGeometry = new THREE.SphereGeometry(1, 20, 20);
-var sphereMaterial = new THREE.MeshStandardMaterial();
-var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-sphere.castShadow = true;
-scene.add(sphere);
+  // 创建物理世界立方体
+  var cubeShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5));
+
+  // 创建物理世界物体
+  var cubeBody = new CANNON.Body({
+    shape: cubeShape,
+    position: new CANNON.Vec3(0, 0, 0),
+    // 立方体质量
+    mass: 1,
+    // 物体材质
+    material: cubeWorldMaterial
+  });
+  // 将物体添加到物理世界
+  world.addBody(cubeBody);
+
+  // 添加监听碰撞事件
+  function HitEvent(e) {
+    // 获取碰撞的强度
+    var impactStrength = e.contact.getImpactVelocityAlongNormal();
+    if (impactStrength > 2) {
+      HitSound.currentTime = 0;
+      HitSound.play();
+    }
+  }
+  cubeBody.addEventListener('collide', HitEvent);
+  cubeArr.push({
+    mesh: cube,
+    body: cubeBody
+  });
+}
+window.addEventListener('click', function () {
+  createCube();
+});
 var floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshStandardMaterial());
 floor.position.set(0, -5, 0);
 floor.rotation.x = -Math.PI / 2;
@@ -88293,40 +88328,12 @@ var dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
 dirLight.castShadow = true;
 scene.add(dirLight);
 
-// 设置物体材质
-var sphereWorldMaterial = new CANNON.Material('sphere');
-
 // 创建物理世界
 var world = new CANNON.World();
 world.gravity.set(0, -9.8, 0);
-// 创建物理世界小球形状
-var sphereShape = new CANNON.Sphere(1);
-// 创建物理世界物体
-var sphereBody = new CANNON.Body({
-  shape: sphereShape,
-  position: new CANNON.Vec3(0, 0, 0),
-  // 小球质量
-  mass: 1,
-  // 物体材质
-  material: sphereWorldMaterial
-});
-// 将物体添加到物理世界
-world.addBody(sphereBody);
 
 // 创建击打声音
 var HitSound = new Audio('assets/metalHit.mp3');
-
-// 添加监听碰撞事件
-function HitEvent(e) {
-  // 获取碰撞的强度
-  var impactStrength = e.contact.getImpactVelocityAlongNormal();
-  console.log(impactStrength);
-  if (impactStrength > 2) {
-    HitSound.currentTime = 0;
-    HitSound.play();
-  }
-}
-sphereBody.addEventListener('collide', HitEvent);
 
 // 创建物理世界地面
 var floorMaterial = new CANNON.Material('floor');
@@ -88340,13 +88347,18 @@ floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
 world.addBody(floorBody);
 
 // 设置两种材质碰撞的参数
-var defaultContactMaterial = new CANNON.ContactMaterial(sphereWorldMaterial, floorMaterial, {
+// 设置物体材质
+var cubeWorldMaterial = new CANNON.Material('cube');
+var defaultContactMaterial = new CANNON.ContactMaterial(cubeWorldMaterial, floorMaterial, {
   friction: 0.1,
   // 摩擦力
   restitution: 0.7 // 弹性
 });
 
 world.addContactMaterial(defaultContactMaterial);
+
+// 设置世界碰撞的默认材料
+world.defaultContactMaterial = defaultContactMaterial;
 
 // 初始化渲染器
 var renderer = new THREE.WebGLRenderer();
@@ -88373,7 +88385,11 @@ function render() {
   // controls.update()
   // 更新物理引擎里面世界的物体
   world.step(1 / 144, deltaTime);
-  sphere.position.copy(sphereBody.position);
+  cubeArr.forEach(function (item) {
+    item.mesh.position.copy(item.body.position);
+    // 设置渲染的物体跟随物理的物体旋转
+    item.mesh.quaternion.copy(item.body.quaternion);
+  });
   // 使用渲染器通过相机将场景渲染出来
   renderer.render(scene, camera);
   // 下一帧继续render

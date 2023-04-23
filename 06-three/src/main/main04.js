@@ -1,5 +1,5 @@
 // 目标:
-// 立方体相互碰撞后旋转效果
+// 关联材质设置摩擦与弹性系数
 
 import * as THREE from 'THREE';
 
@@ -25,50 +25,12 @@ scene.add(camera)
 
 
 
-
-const cubeArr = []
-
-function createCube () {
-  // 创建立方体和平面
-  const cubeGeometry = new THREE.BoxGeometry(1, 1, 1)
-  const cubeMaterial = new THREE.MeshStandardMaterial()
-  const cube = new THREE.Mesh(cubeGeometry, cubeMaterial)
-  cube.castShadow = true
-  scene.add(cube)
-
-  // 创建物理世界立方体
-  const cubeShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5))
-
-  // 创建物理世界物体
-  const cubeBody = new CANNON.Body({
-    shape: cubeShape,
-    position: new CANNON.Vec3(0, 0, 0),
-    // 立方体质量
-    mass: 1,
-    // 物体材质
-    material: cubeWorldMaterial
-  })
-  // 将物体添加到物理世界
-  world.addBody(cubeBody)
-
-  // 添加监听碰撞事件
-  function HitEvent (e) {
-    // 获取碰撞的强度
-    const impactStrength = e.contact.getImpactVelocityAlongNormal()
-    if (impactStrength > 2) {
-      HitSound.currentTime = 0;
-      HitSound.play()
-    }
-  }
-  cubeBody.addEventListener('collide', HitEvent)
-
-  cubeArr.push({ mesh: cube, body: cubeBody })
-}
-
-window.addEventListener('click', () => {
-  createCube()
-})
-
+// 创建球和平面
+const sphereGeometry = new THREE.SphereGeometry(1, 20, 20)
+const sphereMaterial = new THREE.MeshStandardMaterial()
+const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
+sphere.castShadow = true
+scene.add(sphere)
 
 const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(20, 20),
@@ -87,18 +49,41 @@ const dirLight = new THREE.DirectionalLight(0xffffff, 0.5)
 dirLight.castShadow = true
 scene.add(dirLight)
 
-
+// 设置物体材质
+const sphereWorldMaterial = new CANNON.Material('sphere')
 
 
 // 创建物理世界
 const world = new CANNON.World()
 world.gravity.set(0, -9.8, 0)
-
+// 创建物理世界小球形状
+const sphereShape = new CANNON.Sphere(1)
+// 创建物理世界物体
+const sphereBody = new CANNON.Body({
+  shape: sphereShape,
+  position: new CANNON.Vec3(0, 0, 0),
+  // 小球质量
+  mass: 1,
+  // 物体材质
+  material: sphereWorldMaterial
+})
+// 将物体添加到物理世界
+world.addBody(sphereBody)
 
 // 创建击打声音
 const HitSound = new Audio('assets/metalHit.mp3')
 
-
+// 添加监听碰撞事件
+function HitEvent (e) {
+  // 获取碰撞的强度
+  const impactStrength = e.contact.getImpactVelocityAlongNormal()
+  console.log(impactStrength)
+  if (impactStrength > 2) {
+    HitSound.currentTime = 0;
+    HitSound.play()
+  }
+}
+sphereBody.addEventListener('collide', HitEvent)
 
 
 
@@ -117,10 +102,8 @@ world.addBody(floorBody)
 
 
 // 设置两种材质碰撞的参数
-// 设置物体材质
-const cubeWorldMaterial = new CANNON.Material('cube')
 const defaultContactMaterial = new CANNON.ContactMaterial(
-  cubeWorldMaterial,
+  sphereWorldMaterial,
   floorMaterial,
   {
     friction: 0.1,  // 摩擦力
@@ -130,8 +113,7 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
 
 world.addContactMaterial(defaultContactMaterial)
 
-// 设置世界碰撞的默认材料
-world.defaultContactMaterial = defaultContactMaterial
+
 
 // 初始化渲染器
 const renderer = new THREE.WebGLRenderer()
@@ -163,11 +145,7 @@ function render () {
   // controls.update()
   // 更新物理引擎里面世界的物体
   world.step(1 / 144, deltaTime)
-  cubeArr.forEach((item) => {
-    item.mesh.position.copy(item.body.position)
-    // 设置渲染的物体跟随物理的物体旋转
-    item.mesh.quaternion.copy(item.body.quaternion)
-  })
+  sphere.position.copy(sphereBody.position)
   // 使用渲染器通过相机将场景渲染出来
   renderer.render(scene, camera)
   // 下一帧继续render
