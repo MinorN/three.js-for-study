@@ -88260,7 +88260,7 @@ var CANNON = _interopRequireWildcard(require("cannon-es"));
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 设置固定地面，小球撞击
+// 监听碰撞事件，设置小球撞击音效
 
 // 导入轨道控制器
 
@@ -88312,6 +88312,20 @@ var sphereBody = new CANNON.Body({
 });
 // 将物体添加到物理世界
 world.addBody(sphereBody);
+
+// 创建击打声音
+var HitSound = new Audio('assets/metalHit.mp3');
+
+// 添加监听碰撞事件
+function HitEvent(e) {
+  // 获取碰撞的强度
+  var impactStrength = e.contact.getImpactVelocityAlongNormal();
+  console.log(impactStrength);
+  if (impactStrength > 5) {
+    HitSound.play();
+  }
+}
+sphereBody.addEventListener('collide', HitEvent);
 
 // 创建物理世界地面
 var floorShape = new CANNON.Plane();
@@ -88379,7 +88393,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64205" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51434" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

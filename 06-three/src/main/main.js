@@ -1,5 +1,5 @@
 // 目标:
-// 设置固定地面，小球撞击
+// 监听碰撞事件，设置小球撞击音效
 
 import * as THREE from 'THREE';
 
@@ -68,6 +68,23 @@ const sphereBody = new CANNON.Body({
 })
 // 将物体添加到物理世界
 world.addBody(sphereBody)
+
+// 创建击打声音
+const HitSound = new Audio('assets/metalHit.mp3')
+
+// 添加监听碰撞事件
+function HitEvent (e) {
+  // 获取碰撞的强度
+  const impactStrength = e.contact.getImpactVelocityAlongNormal()
+  console.log(impactStrength)
+  if (impactStrength > 5) {
+    HitSound.play()
+  }
+
+}
+sphereBody.addEventListener('collide', HitEvent)
+
+
 
 // 创建物理世界地面
 const floorShape = new CANNON.Plane()
