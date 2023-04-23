@@ -1,5 +1,5 @@
 // 目标:
-// 监听碰撞事件，设置小球撞击音效
+// 关联材质设置摩擦与弹性系数
 
 import * as THREE from 'THREE';
 
@@ -50,7 +50,8 @@ dirLight.castShadow = true
 scene.add(dirLight)
 
 // 设置物体材质
-const sphereWorldMaterial = new CANNON.Material()
+const sphereWorldMaterial = new CANNON.Material('sphere')
+
 
 // 创建物理世界
 const world = new CANNON.World()
@@ -77,18 +78,20 @@ function HitEvent (e) {
   // 获取碰撞的强度
   const impactStrength = e.contact.getImpactVelocityAlongNormal()
   console.log(impactStrength)
-  if (impactStrength > 5) {
+  if (impactStrength > 2) {
+    HitSound.currentTime = 0;
     HitSound.play()
   }
-
 }
 sphereBody.addEventListener('collide', HitEvent)
 
 
 
 // 创建物理世界地面
+const floorMaterial = new CANNON.Material('floor')
 const floorShape = new CANNON.Plane()
 const floorBody = new CANNON.Body()
+floorBody.material = floorMaterial
 floorBody.mass = 0 // 保持不动，也就是mass为0
 floorBody.addShape(floorShape)
 floorBody.position.set(0, -5, 0)
@@ -96,6 +99,19 @@ floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2)
 world.addBody(floorBody)
 
 
+
+
+// 设置两种材质碰撞的参数
+const defaultContactMaterial = new CANNON.ContactMaterial(
+  sphereWorldMaterial,
+  floorMaterial,
+  {
+    friction: 0.1,  // 摩擦力
+    restitution: 0.7  // 弹性
+  }
+)
+
+world.addContactMaterial(defaultContactMaterial)
 
 
 
