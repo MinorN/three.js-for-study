@@ -1,5 +1,5 @@
 // 目标:
-// 立方体相互碰撞后旋转效果
+// 给物体施加一个力
 
 import * as THREE from 'THREE';
 
@@ -48,6 +48,10 @@ function createCube () {
     // 物体材质
     material: cubeWorldMaterial
   })
+  cubeBody.applyLocalForce(
+    new CANNON.Vec3(180, 0, 0),  // 添加的力的大小和方向
+    new CANNON.Vec3(0, 0, 0)  // 施加的力是在哪个位置
+  )
   // 将物体添加到物理世界
   world.addBody(cubeBody)
 
