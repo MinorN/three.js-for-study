@@ -117,62 +117,63 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
-var bundleURL = null;
-function getBundleURLCached() {
-  if (!bundleURL) {
-    bundleURL = getBundleURL();
-  }
-  return bundleURL;
-}
-function getBundleURL() {
-  // Attempt to find the URL of the current script and use that as the base URL
-  try {
-    throw new Error();
-  } catch (err) {
-    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
-    if (matches) {
-      return getBaseURL(matches[0]);
-    }
-  }
-  return '/';
-}
-function getBaseURL(url) {
-  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)?\/[^/]+(?:\?.*)?$/, '$1') + '/';
-}
-exports.getBundleURL = getBundleURLCached;
-exports.getBaseURL = getBaseURL;
-},{}],"../node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
-var bundle = require('./bundle-url');
-function updateLink(link) {
-  var newLink = link.cloneNode();
-  newLink.onload = function () {
-    link.remove();
-  };
-  newLink.href = link.href.split('?')[0] + '?' + Date.now();
-  link.parentNode.insertBefore(newLink, link.nextSibling);
-}
-var cssTimeout = null;
-function reloadCSS() {
-  if (cssTimeout) {
-    return;
-  }
-  cssTimeout = setTimeout(function () {
-    var links = document.querySelectorAll('link[rel="stylesheet"]');
-    for (var i = 0; i < links.length; i++) {
-      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
-        updateLink(links[i]);
-      }
-    }
-    cssTimeout = null;
-  }, 50);
-}
-module.exports = reloadCSS;
-},{"./bundle-url":"../node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"assets/css/style.css":[function(require,module,exports) {
-var reloadCSS = require('_css_loader');
-module.hot.dispose(reloadCSS);
-module.hot.accept(reloadCSS);
-},{"_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+})({"main/main.js":[function(require,module,exports) {
+// 目标:
+// WEBGL实现一个三角形
+
+// 获取 canvas 元素
+var canvas = document.getElementById('canvas');
+// canvas 宽高
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+// 获取webgl绘图的上下文
+var gl = canvas.getContext('webgl');
+// 第一次创建上下文的时候要设置视口大小
+gl.viewport(0, 0, canvas.width, canvas.height);
+
+// 创建顶点着色器
+var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+// 需要编写glsl代码
+gl.shaderSource(vertexShader, "\n  attribute vec4 a_Position;\n  void main(){\n    gl_Position = a_Position;\n  }\n");
+// 注意 上述那个 分号 必须写
+// gl编译顶点着色器
+gl.compileShader(vertexShader);
+
+// 创建片元着色器
+var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+// 需要编写glsl代码
+gl.shaderSource(fragmentShader, "\n  void main(){\n    gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n  }\n");
+// 注意 上述那个 分号 必须写
+// 编译
+gl.compileShader(fragmentShader);
+
+// 创建程序连接顶点着色器和片元着色器
+var program = gl.createProgram();
+// 连接顶点着色器和片元着色器
+gl.attachShader(program, vertexShader);
+gl.attachShader(program, fragmentShader);
+// 链接程序
+gl.linkProgram(program);
+// 使用程序进行渲染
+gl.useProgram(program);
+// 创建顶点缓冲区对象
+var vertexBuffer = gl.createBuffer();
+// 绑定顶点缓冲区对象
+gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+// 向顶点缓冲区传递数据
+var vertices = new Float32Array([0.0, 0.5, -0.5, -0.5, 0.5, -0.5]);
+gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+// 获取顶点着色器中a_Position中变量的位置
+var a_Position = gl.getAttribLocation(program, 'a_Position');
+// 将顶点缓冲区对象分配给a_Position
+gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
+// 启用顶点着色器中a_Position 变量
+gl.enableVertexAttribArray(a_Position);
+
+// 绘制三角形
+gl.drawArrays(gl.TRIANGLES, 0, 3);
+},{}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -197,7 +198,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64755" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52636" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
@@ -341,5 +342,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js"], null)
-//# sourceMappingURL=/style.a11e3109.js.map
+},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","main/main.js"], null)
+//# sourceMappingURL=/main.0632549a.js.map
