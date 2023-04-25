@@ -119,7 +119,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   return newRequire;
 })({"main/main.js":[function(require,module,exports) {
 // 目标:
-// WEBGL实现一个三角形
+// 缩放矩阵与uniform变量和varying变量
 
 // 获取 canvas 元素
 var canvas = document.getElementById('canvas');
@@ -134,7 +134,7 @@ gl.viewport(0, 0, canvas.width, canvas.height);
 // 创建顶点着色器
 var vertexShader = gl.createShader(gl.VERTEX_SHADER);
 // 需要编写glsl代码
-gl.shaderSource(vertexShader, "\n  attribute vec4 a_Position;\n  void main(){\n    gl_Position = a_Position;\n  }\n");
+gl.shaderSource(vertexShader, "\n  attribute vec4 a_Position;\n  uniform mat4 u_Mat;\n  varying vec4 v_Color;\n  void main(){\n    gl_Position = u_Mat * a_Position;\n    v_Color = gl_Position;\n  }\n");
 // 注意 上述那个 分号 必须写
 // gl编译顶点着色器
 gl.compileShader(vertexShader);
@@ -142,7 +142,7 @@ gl.compileShader(vertexShader);
 // 创建片元着色器
 var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 // 需要编写glsl代码
-gl.shaderSource(fragmentShader, "\n  void main(){\n    gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n  }\n");
+gl.shaderSource(fragmentShader, "\n  precision mediump float;\n  varying vec4 v_Color;\n  void main(){\n    gl_FragColor = v_Color;\n  }\n");
 // 注意 上述那个 分号 必须写
 // 编译
 gl.compileShader(fragmentShader);
@@ -170,9 +170,32 @@ var a_Position = gl.getAttribLocation(program, 'a_Position');
 gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
 // 启用顶点着色器中a_Position 变量
 gl.enableVertexAttribArray(a_Position);
+var scale = {
+  x: 1.5,
+  y: 1.5,
+  z: 1.5
+};
+var mat = new Float32Array([scale.x, 0.0, 0.0, 0.0, 0.0, scale.y, 0.0, 0.0, 0.0, 0.0, scale.z, 0.0, 0.0, 0.0, 0.0, 1.0]);
 
-// 绘制三角形
-gl.drawArrays(gl.TRIANGLES, 0, 3);
+// 获取着色器程序的uniform并且传入mat
+gl.uniformMatrix4fv(gl.getUniformLocation(program, 'u_Mat'), false, mat);
+function animate() {
+  scale.x -= 0.01;
+  if (scale.x < 0) {
+    scale.x = 1;
+  }
+  var mat = new Float32Array([scale.x, 0.0, 0.0, 0.0, 0.0, scale.x, 0.0, 0.0, 0.0, 0.0, scale.x, 0.0, 0.0, 0.0, 0.0, 1.0]);
+  // 获取着色器程序的uniform并且传入mat
+  gl.uniformMatrix4fv(gl.getUniformLocation(program, 'u_Mat'), false, mat);
+  // 清除canvas
+  gl.clearColor(0.0, 0.0, 0.0, 0.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  // 绘制三角形
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  requestAnimationFrame(animate);
+}
+animate();
 },{}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -198,7 +221,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52636" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54309" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

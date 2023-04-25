@@ -1,5 +1,5 @@
 // 目标:
-// 缩放矩阵与uniform变量和varying变量
+// WEBGL实现一个三角形
 
 // 获取 canvas 元素
 let canvas = document.getElementById('canvas')
@@ -16,11 +16,8 @@ let vertexShader = gl.createShader(gl.VERTEX_SHADER)
 // 需要编写glsl代码
 gl.shaderSource(vertexShader, `
   attribute vec4 a_Position;
-  uniform mat4 u_Mat;
-  varying vec4 v_Color;
   void main(){
-    gl_Position = u_Mat * a_Position;
-    v_Color = gl_Position;
+    gl_Position = a_Position;
   }
 `)
 // 注意 上述那个 分号 必须写
@@ -32,10 +29,8 @@ gl.compileShader(vertexShader)
 let fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)
 // 需要编写glsl代码
 gl.shaderSource(fragmentShader, `
-  precision mediump float;
-  varying vec4 v_Color;
   void main(){
-    gl_FragColor = v_Color;
+    gl_FragColor = vec4(1.0,0.0,0.0,1.0);
   }
 `)
 // 注意 上述那个 分号 必须写
@@ -73,46 +68,5 @@ gl.enableVertexAttribArray(a_Position)
 
 
 
-
-
-const scale = {
-  x: 1.5,
-  y: 1.5,
-  z: 1.5
-}
-
-const mat = new Float32Array([
-  scale.x, 0.0, 0.0, 0.0,
-  0.0, scale.y, 0.0, 0.0,
-  0.0, 0.0, scale.z, 0.0,
-  0.0, 0.0, 0.0, 1.0,
-])
-
-// 获取着色器程序的uniform并且传入mat
-gl.uniformMatrix4fv(gl.getUniformLocation(program, 'u_Mat'), false, mat)
-
-
-
-function animate () {
-  scale.x -= 0.01
-  if (scale.x < 0) {
-    scale.x = 1
-  }
-  const mat = new Float32Array([
-    scale.x, 0.0, 0.0, 0.0,
-    0.0, scale.x, 0.0, 0.0,
-    0.0, 0.0, scale.x, 0.0,
-    0.0, 0.0, 0.0, 1.0,
-  ])
-  // 获取着色器程序的uniform并且传入mat
-  gl.uniformMatrix4fv(gl.getUniformLocation(program, 'u_Mat'), false, mat)
-  // 清除canvas
-  gl.clearColor(0.0, 0.0, 0.0, 0.0)
-  gl.clear(gl.COLOR_BUFFER_BIT)
-
-  // 绘制三角形
-  gl.drawArrays(gl.TRIANGLES, 0, 3)
-  requestAnimationFrame(animate)
-}
-
-animate()
+// 绘制三角形
+gl.drawArrays(gl.TRIANGLES, 0, 3)
