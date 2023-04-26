@@ -1,5 +1,5 @@
 // 目标:
-// 着色器基本规范
+// 缩放矩阵与uniform变量和varying变量
 
 // 获取 canvas 元素
 let canvas = document.getElementById('canvas')

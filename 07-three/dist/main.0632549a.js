@@ -119,7 +119,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   return newRequire;
 })({"main/main.js":[function(require,module,exports) {
 // 目标:
-// 缩放矩阵与uniform变量和varying变量
+// 着色器基本规范
 
 // 获取 canvas 元素
 var canvas = document.getElementById('canvas');
@@ -221,7 +221,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54309" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51614" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
