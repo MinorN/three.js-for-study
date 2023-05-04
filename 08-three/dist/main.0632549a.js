@@ -36720,10 +36720,10 @@ if (typeof window !== 'undefined') {
     window.__THREE__ = REVISION;
   }
 }
-},{}],"shader/basic/vertex.glsl":[function(require,module,exports) {
-module.exports = "#define GLSLIFY 1\nvoid main(){\n    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position,1.0);\n}";
-},{}],"shader/basic/fragment.glsl":[function(require,module,exports) {
-module.exports = "#define GLSLIFY 1\nvoid main(){\n    gl_FragColor = vec4(1.0,1.0,0.0,1.0);\n}";
+},{}],"shader/raw/vertex.glsl":[function(require,module,exports) {
+module.exports = "\nprecision lowp float;\n#define GLSLIFY 1\n// 精度范围\n// highhp -2^16~2^16\n// mediump -2^10~2^10\n// lowp -2^8~2^8\n\nattribute vec3 position;\nattribute vec2 uv;\n\nuniform mat4 modelMatrix;\nuniform mat4 viewMatrix;\nuniform mat4 projectionMatrix;\n\nvarying vec2 vUv;\n\nvoid main(){\n    vUv = uv;\n    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position,1.0);\n}";
+},{}],"shader/raw/fragment.glsl":[function(require,module,exports) {
+module.exports = "\nprecision lowp float;\n#define GLSLIFY 1\n\nvarying vec2 vUv;\n\nvoid main(){\n    gl_FragColor = vec4(vUv,0.0,1.0);\n}";
 },{}],"../node_modules/three/build/three.module.js":[function(require,module,exports) {
 var define;
 "use strict";
@@ -74120,14 +74120,14 @@ exports.OrbitControls = OrbitControls;
 "use strict";
 
 var THREE = _interopRequireWildcard(require("THREE"));
-var _vertex = _interopRequireDefault(require("../shader/basic/vertex.glsl"));
-var _fragment = _interopRequireDefault(require("../shader/basic/fragment.glsl"));
+var _vertex = _interopRequireDefault(require("../shader/raw/vertex.glsl"));
+var _fragment = _interopRequireDefault(require("../shader/raw/fragment.glsl"));
 var _OrbitControls = require("three/examples/jsm/controls/OrbitControls");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 着色器插件 shader language
+// 认识rawShaderMaterial
 
 // 顶点着色器
 
@@ -74151,8 +74151,8 @@ var params = {
   uScale: 0.1
 };
 
-// 创建着色器材质
-var shaderMaterial = new THREE.ShaderMaterial({
+// 创建原始着色器材质
+var rawShaderMaterial = new THREE.RawShaderMaterial({
   vertexShader: _vertex.default,
   fragmentShader: _fragment.default
 });
@@ -74163,7 +74163,7 @@ var material = new THREE.MeshBasicMaterial({
 // 创建平面
 var floor = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 64, 64),
 // material
-shaderMaterial);
+rawShaderMaterial);
 scene.add(floor);
 
 // 初始化渲染器
@@ -74193,7 +74193,7 @@ function render() {
   requestAnimationFrame(render);
 }
 render();
-},{"THREE":"../node_modules/THREE/build/three.module.js","../shader/basic/vertex.glsl":"shader/basic/vertex.glsl","../shader/basic/fragment.glsl":"shader/basic/fragment.glsl","three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"THREE":"../node_modules/THREE/build/three.module.js","../shader/raw/vertex.glsl":"shader/raw/vertex.glsl","../shader/raw/fragment.glsl":"shader/raw/fragment.glsl","three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;

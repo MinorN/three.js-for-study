@@ -1,13 +1,13 @@
 // 目标:
-// 着色器插件 shader language
+// 认识rawShaderMaterial
 
 
 import * as THREE from 'THREE';
 
 // 顶点着色器
-import basicVertexShader from '../shader/basic/vertex.glsl'
+import basicVertexShader from '../shader/raw/vertex.glsl'
 // 片元着色器
-import basicFragmentShader from '../shader/basic/fragment.glsl'
+import basicFragmentShader from '../shader/raw/fragment.glsl'
 // 导入轨道控制器
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
@@ -28,8 +28,8 @@ const params = {
   uScale: 0.1
 }
 
-// 创建着色器材质
-const shaderMaterial = new THREE.ShaderMaterial({
+// 创建原始着色器材质
+const rawShaderMaterial = new THREE.RawShaderMaterial({
   vertexShader: basicVertexShader,
   fragmentShader: basicFragmentShader
 })
@@ -40,7 +40,7 @@ const material = new THREE.MeshBasicMaterial({ color: "#00ff00" })
 const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(1, 1, 64, 64),
   // material
-  shaderMaterial
+  rawShaderMaterial
 )
 
 scene.add(floor)
