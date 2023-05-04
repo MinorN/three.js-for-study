@@ -1,9 +1,13 @@
 // 目标:
-// 初识着色器语言
+// 着色器插件 shader language
 
 
 import * as THREE from 'THREE';
 
+// 顶点着色器
+import basicVertexShader from '../shader/basic/vertex.glsl'
+// 片元着色器
+import basicFragmentShader from '../shader/basic/fragment.glsl'
 // 导入轨道控制器
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
@@ -26,16 +30,8 @@ const params = {
 
 // 创建着色器材质
 const shaderMaterial = new THREE.ShaderMaterial({
-  vertexShader: `
-    void main(){
-      gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position,1.0);
-    }
-  `,
-  fragmentShader: `
-    void main(){
-      gl_FragColor = vec4(1.0,1.0,0.0,1.0);
-    }
-  `
+  vertexShader: basicVertexShader,
+  fragmentShader: basicFragmentShader
 })
 
 const material = new THREE.MeshBasicMaterial({ color: "#00ff00" })

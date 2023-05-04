@@ -36720,6 +36720,10 @@ if (typeof window !== 'undefined') {
     window.__THREE__ = REVISION;
   }
 }
+},{}],"shader/basic/vertex.glsl":[function(require,module,exports) {
+module.exports = "#define GLSLIFY 1\nvoid main(){\n    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position,1.0);\n}";
+},{}],"shader/basic/fragment.glsl":[function(require,module,exports) {
+module.exports = "#define GLSLIFY 1\nvoid main(){\n    gl_FragColor = vec4(1.0,1.0,0.0,1.0);\n}";
 },{}],"../node_modules/three/build/three.module.js":[function(require,module,exports) {
 var define;
 "use strict";
@@ -74116,11 +74120,18 @@ exports.OrbitControls = OrbitControls;
 "use strict";
 
 var THREE = _interopRequireWildcard(require("THREE"));
+var _vertex = _interopRequireDefault(require("../shader/basic/vertex.glsl"));
+var _fragment = _interopRequireDefault(require("../shader/basic/fragment.glsl"));
 var _OrbitControls = require("three/examples/jsm/controls/OrbitControls");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 初识着色器语言
+// 着色器插件 shader language
+
+// 顶点着色器
+
+// 片元着色器
 
 // 导入轨道控制器
 
@@ -74142,8 +74153,8 @@ var params = {
 
 // 创建着色器材质
 var shaderMaterial = new THREE.ShaderMaterial({
-  vertexShader: "\n    void main(){\n      gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position,1.0);\n    }\n  ",
-  fragmentShader: "\n    void main(){\n      gl_FragColor = vec4(1.0,1.0,0.0,1.0);\n    }\n  "
+  vertexShader: _vertex.default,
+  fragmentShader: _fragment.default
 });
 var material = new THREE.MeshBasicMaterial({
   color: "#00ff00"
@@ -74182,7 +74193,7 @@ function render() {
   requestAnimationFrame(render);
 }
 render();
-},{"THREE":"../node_modules/THREE/build/three.module.js","three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"THREE":"../node_modules/THREE/build/three.module.js","../shader/basic/vertex.glsl":"shader/basic/vertex.glsl","../shader/basic/fragment.glsl":"shader/basic/fragment.glsl","three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -74207,7 +74218,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50380" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54850" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
