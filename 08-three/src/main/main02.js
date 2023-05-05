@@ -1,5 +1,5 @@
 // 目标:
-// 控制定点位置打造波浪形状
+// 认识rawShaderMaterial
 
 
 import * as THREE from 'THREE';
@@ -31,9 +31,7 @@ const params = {
 // 创建原始着色器材质
 const rawShaderMaterial = new THREE.RawShaderMaterial({
   vertexShader: basicVertexShader,
-  fragmentShader: basicFragmentShader,
-  // wireframe: true
-  side: THREE.DoubleSide,
+  fragmentShader: basicFragmentShader
 })
 
 const material = new THREE.MeshBasicMaterial({ color: "#00ff00" })

@@ -14,10 +14,19 @@ uniform mat4 projectionMatrix;
 
 
 varying vec2 vUv;
+varying float vElevation;
 
 
 
 void main(){
     vUv = uv;
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position,1.0);
+    vec4 modelPosition = modelMatrix * vec4(position,1.0);
+    
+
+    // 内置函数 sin
+    modelPosition.z = sin(modelPosition.x * 10.0) * 0.05;
+    modelPosition.z += sin(modelPosition.y * 10.0) * 0.05;
+    vElevation = modelPosition.z;
+
+    gl_Position = projectionMatrix * viewMatrix * modelPosition;
 }

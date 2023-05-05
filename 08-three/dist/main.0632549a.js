@@ -36721,9 +36721,9 @@ if (typeof window !== 'undefined') {
   }
 }
 },{}],"shader/raw/vertex.glsl":[function(require,module,exports) {
-module.exports = "\nprecision lowp float;\n#define GLSLIFY 1\n// 精度范围\n// highhp -2^16~2^16\n// mediump -2^10~2^10\n// lowp -2^8~2^8\n\nattribute vec3 position;\nattribute vec2 uv;\n\nuniform mat4 modelMatrix;\nuniform mat4 viewMatrix;\nuniform mat4 projectionMatrix;\n\nvarying vec2 vUv;\n\nvoid main(){\n    vUv = uv;\n    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position,1.0);\n}";
+module.exports = "\nprecision lowp float;\n#define GLSLIFY 1\n// 精度范围\n// highhp -2^16~2^16\n// mediump -2^10~2^10\n// lowp -2^8~2^8\n\nattribute vec3 position;\nattribute vec2 uv;\n\nuniform mat4 modelMatrix;\nuniform mat4 viewMatrix;\nuniform mat4 projectionMatrix;\n\nvarying vec2 vUv;\nvarying float vElevation;\n\nvoid main(){\n    vUv = uv;\n    vec4 modelPosition = modelMatrix * vec4(position,1.0);\n    \n\n    // 内置函数 sin\n    modelPosition.z = sin(modelPosition.x * 10.0) * 0.05;\n    modelPosition.z += sin(modelPosition.y * 10.0) * 0.05;\n    vElevation = modelPosition.z;\n\n    gl_Position = projectionMatrix * viewMatrix * modelPosition;\n}";
 },{}],"shader/raw/fragment.glsl":[function(require,module,exports) {
-module.exports = "\nprecision lowp float;\n#define GLSLIFY 1\n\nvarying vec2 vUv;\n\nvoid main(){\n    gl_FragColor = vec4(vUv,0.0,1.0);\n}";
+module.exports = "\nprecision lowp float;\n#define GLSLIFY 1\n\nvarying vec2 vUv;\nvarying float vElevation;\n\nvoid main(){\n    // gl_FragColor = vec4(vUv,0.0,1.0);\n    float height = vElevation + 0.05 * 10.0;\n    gl_FragColor = vec4(height * 1.0,0.0,0.0,1.0);\n}";
 },{}],"../node_modules/three/build/three.module.js":[function(require,module,exports) {
 var define;
 "use strict";
@@ -74127,7 +74127,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // 目标:
-// 认识rawShaderMaterial
+// 控制定点位置打造波浪形状
 
 // 顶点着色器
 
@@ -74154,7 +74154,9 @@ var params = {
 // 创建原始着色器材质
 var rawShaderMaterial = new THREE.RawShaderMaterial({
   vertexShader: _vertex.default,
-  fragmentShader: _fragment.default
+  fragmentShader: _fragment.default,
+  // wireframe: true
+  side: THREE.DoubleSide
 });
 var material = new THREE.MeshBasicMaterial({
   color: "#00ff00"
@@ -74218,7 +74220,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54850" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51695" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
