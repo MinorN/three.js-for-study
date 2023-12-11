@@ -1,7 +1,6 @@
 // 目标:
 // 控制定点位置打造波浪形状
 
-
 import * as THREE from 'THREE';
 
 // 顶点着色器
@@ -22,7 +21,7 @@ scene.add(camera)
 
 // 创建纹理加载器
 const textureLoader = new THREE.TextureLoader()
-const texture = textureLoader.load('./texture/da.jpeg')
+const texture = textureLoader.load('./textures/a.jpg')
 const params = {
   uFrequency: 10,
   uScale: 0.1
@@ -34,6 +33,14 @@ const rawShaderMaterial = new THREE.RawShaderMaterial({
   fragmentShader: basicFragmentShader,
   // wireframe: true
   side: THREE.DoubleSide,
+  uniforms: {
+    uTime: {
+      value: 0,
+    },
+    uTexture: {
+      value: texture,
+    }
+  }
 })
 
 const material = new THREE.MeshBasicMaterial({ color: "#00ff00" })
@@ -69,7 +76,9 @@ scene.add(axesHelper)
 const clock = new THREE.Clock()
 // 设置渲染函数
 function render () {
-  let deltaTime = clock.getDelta()
+  // let deltaTime = clock.getDelta()
+  const elapsedTime = clock.getElapsedTime()
+  rawShaderMaterial.uniforms.uTime.value = elapsedTime
   controls.update()
   // 使用渲染器通过相机将场景渲染出来
   renderer.render(scene, camera)

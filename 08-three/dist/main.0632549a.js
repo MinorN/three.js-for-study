@@ -36721,9 +36721,9 @@ if (typeof window !== 'undefined') {
   }
 }
 },{}],"shader/raw/vertex.glsl":[function(require,module,exports) {
-module.exports = "\nprecision lowp float;\n#define GLSLIFY 1\n// 精度范围\n// highhp -2^16~2^16\n// mediump -2^10~2^10\n// lowp -2^8~2^8\n\nattribute vec3 position;\nattribute vec2 uv;\n\nuniform mat4 modelMatrix;\nuniform mat4 viewMatrix;\nuniform mat4 projectionMatrix;\n\nvarying vec2 vUv;\nvarying float vElevation;\n\nvoid main(){\n    vUv = uv;\n    vec4 modelPosition = modelMatrix * vec4(position,1.0);\n    \n\n    // 内置函数 sin\n    modelPosition.z = sin(modelPosition.x * 10.0) * 0.05;\n    modelPosition.z += sin(modelPosition.y * 10.0) * 0.05;\n    vElevation = modelPosition.z;\n\n    gl_Position = projectionMatrix * viewMatrix * modelPosition;\n}";
+module.exports = "\nprecision lowp float;\n#define GLSLIFY 1\n// 精度范围\n// highhp -2^16~2^16\n// mediump -2^10~2^10\n// lowp -2^8~2^8\n\nattribute vec3 position;\nattribute vec2 uv;\n\nuniform mat4 modelMatrix;\nuniform mat4 viewMatrix;\nuniform mat4 projectionMatrix;\n\nvarying vec2 vUv;\nvarying float vElevation;\n\n// 获取时间\nuniform float uTime;\n\nvoid main(){\n    vUv = uv;\n    vec4 modelPosition = modelMatrix * vec4(position,1.0);\n    \n\n    // 内置函数 sin\n    modelPosition.z = sin((modelPosition.x + uTime) * 10.0) * 0.05;\n    modelPosition.z += sin((modelPosition.y + uTime) * 10.0) * 0.05;\n    vElevation = modelPosition.z;\n\n    gl_Position = projectionMatrix * viewMatrix * modelPosition;\n}";
 },{}],"shader/raw/fragment.glsl":[function(require,module,exports) {
-module.exports = "\nprecision lowp float;\n#define GLSLIFY 1\n\nvarying vec2 vUv;\nvarying float vElevation;\n\nvoid main(){\n    // gl_FragColor = vec4(vUv,0.0,1.0);\n    float height = vElevation + 0.05 * 10.0;\n    gl_FragColor = vec4(height * 1.0,0.0,0.0,1.0);\n}";
+module.exports = "\nprecision lowp float;\n#define GLSLIFY 1\n\nvarying vec2 vUv;\nvarying float vElevation;\n\nuniform sampler2D uTexture;\n\nvoid main(){\n    // gl_FragColor = vec4(vUv,0.0,1.0);\n    float height = vElevation + 0.05 * 10.0;\n    // gl_FragColor = vec4(height * 1.0,0.0,0.0,1.0);\n\n    // 根据uv进行采样\n    vec4 textureColor = texture2D(uTexture,vUv);\n    textureColor.rgb*= height;\n    gl_FragColor = textureColor;\n}";
 },{}],"../node_modules/three/build/three.module.js":[function(require,module,exports) {
 var define;
 "use strict";
@@ -74145,7 +74145,7 @@ scene.add(camera);
 
 // 创建纹理加载器
 var textureLoader = new THREE.TextureLoader();
-var texture = textureLoader.load('./texture/da.jpeg');
+var texture = textureLoader.load('./textures/a.jpg');
 var params = {
   uFrequency: 10,
   uScale: 0.1
@@ -74156,7 +74156,15 @@ var rawShaderMaterial = new THREE.RawShaderMaterial({
   vertexShader: _vertex.default,
   fragmentShader: _fragment.default,
   // wireframe: true
-  side: THREE.DoubleSide
+  side: THREE.DoubleSide,
+  uniforms: {
+    uTime: {
+      value: 0
+    },
+    uTexture: {
+      value: texture
+    }
+  }
 });
 var material = new THREE.MeshBasicMaterial({
   color: "#00ff00"
@@ -74187,7 +74195,9 @@ scene.add(axesHelper);
 var clock = new THREE.Clock();
 // 设置渲染函数
 function render() {
-  var deltaTime = clock.getDelta();
+  // let deltaTime = clock.getDelta()
+  var elapsedTime = clock.getElapsedTime();
+  rawShaderMaterial.uniforms.uTime.value = elapsedTime;
   controls.update();
   // 使用渲染器通过相机将场景渲染出来
   renderer.render(scene, camera);
@@ -74220,7 +74230,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51695" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52546" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

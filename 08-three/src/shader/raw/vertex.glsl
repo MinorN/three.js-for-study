@@ -16,6 +16,9 @@ uniform mat4 projectionMatrix;
 varying vec2 vUv;
 varying float vElevation;
 
+// 获取时间
+uniform float uTime;
+
 
 
 void main(){
@@ -24,8 +27,8 @@ void main(){
     
 
     // 内置函数 sin
-    modelPosition.z = sin(modelPosition.x * 10.0) * 0.05;
-    modelPosition.z += sin(modelPosition.y * 10.0) * 0.05;
+    modelPosition.z = sin((modelPosition.x + uTime) * 10.0) * 0.05;
+    modelPosition.z += sin((modelPosition.y + uTime) * 10.0) * 0.05;
     vElevation = modelPosition.z;
 
     gl_Position = projectionMatrix * viewMatrix * modelPosition;

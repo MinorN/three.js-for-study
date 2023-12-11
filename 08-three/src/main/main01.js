@@ -19,7 +19,6 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 camera.position.set(0, 0, 5)
 scene.add(camera)
 
-
 // 创建纹理加载器
 const textureLoader = new THREE.TextureLoader()
 const texture = textureLoader.load('./texture/da.jpeg')
